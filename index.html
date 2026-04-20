@@ -1087,13 +1087,58 @@ function updateClock() {
   document.getElementById('clock').textContent = now.toUTCString().slice(17,25) + ' UTC';
 }
 
+// ── FETCH REAL PRICES ─────────────────────────────────────────────────────────
+async function fetchRealPrice(symbol) {
+  try {
+    const res = await fetch(`/.netlify/functions/finnhub?symbol=${symbol}&type=quote`);
+    const data = await res.json();
+    return data;
+  } catch(err) {
+    console.log('Price fetch failed for', symbol, err);
+    return null;
+  }
+}
+
+async function updateRealPrices(stocks) {
+  for(const stock of stocks) {
+    const data = await fetchRealPrice(stock.ticker);
+    if(data && data.c && data.c > 0) {
+      stock.price  = data.c;
+      stock.change = data.dp;
+      console.log(`✅ ${stock.ticker}: $${data.c} (${data.dp}%)`);
+    } else {
+      console.log(`⚠️ ${stock.ticker}: using mock data`);
+    }
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
-renderTape();
-const initStocks = stockDB.biotech;
-renderSummary(initStocks);
-renderCards(initStocks);
-updateClock();
-setInterval(updateClock, 1000);
+async function init() {
+  renderTape();
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  const initStocks = stockDB.biotech;
+  renderSummary(initStocks);
+  renderCards(initStocks);
+
+  // Fetch real prices in background
+  console.log('Fetching real prices...');
+  await updateRealPrices(initStocks);
+  console.log('Real prices loaded — refreshing cards...');
+  renderSummary(initStocks);
+  renderCards(initStocks);
+
+  // Refresh prices every 60 seconds
+  setInterval(async () => {
+    const stocks = stockDB[currentSector];
+    await updateRealPrices(stocks);
+    renderSummary(stocks);
+    renderCards(stocks);
+  }, 60000);
+}
+
+init();
 </script>
 </body>
 </html>
