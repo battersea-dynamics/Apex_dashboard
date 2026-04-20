@@ -1375,7 +1375,8 @@ async function searchAndShowStock(ticker) {
   for(const [sector, stocks] of Object.entries(stockDB)) {
     const found = stocks.find(s => s.ticker === ticker);
     if(found) {
-      // Switch to that sector and select
+      // Add to watchlist even if in stockDB
+      addToWatchlist({...found, sector});
       const sectorBtn = document.querySelector(`.sector-btn[onclick*="${sector}"]`);
       if(sectorBtn) selectSector(sector, sectorBtn);
       setTimeout(() => selectStock(ticker), 800);
