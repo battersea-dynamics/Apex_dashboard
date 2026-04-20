@@ -1359,7 +1359,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-async function searchAndShowStock(ticker) {
+async function searchAndShowStock(ticker, companyName) {
   // Close search UI
   document.getElementById('searchResults').classList.remove('open');
   document.getElementById('searchInput').value = '';
@@ -1391,7 +1391,7 @@ async function searchAndShowStock(ticker) {
   ]);
 
   // Find name from symbolDB
-  const meta = symbolDB.find(s => s.ticker === ticker) || { name: ticker, sector:'search' };
+  const meta = symbolDB.find(s => s.ticker === ticker) || { name: companyName || ticker, sector:'search' };
 
   if(!priceData || !priceData.c || priceData.c === 0) {
     document.getElementById('detailPanel').innerHTML = `
