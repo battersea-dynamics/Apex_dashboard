@@ -1315,23 +1315,42 @@ let searchTimeout = null;
 
 function onSearchInput(val) {
   clearTimeout(searchTimeout);
-  const q = val.trim().toLowerCase();
+  const q = val.trim();
   const resultsEl = document.getElementById('searchResults');
 
-  if(q.length < 1) { resultsEl.classList.remove('open'); return; }
+  if(q.length < 2) { resultsEl.classList.remove('open'); return; }
 
-  // Filter from local symbolDB first
-  const matches = symbolDB.filter(s =>
-    s.ticker.toLowerCase().startsWith(q) ||
-    s.name.toLowerCase().includes(q)
-  ).slice(0, 6);
+  // Show loading
+  resultsEl.innerHTML = `<div class="search-loading">⬡ Searching markets...</div>`;
+  resultsEl.classList.add('open');
 
-  if(matches.length > 0) {
-    showSearchResults(matches);
-  } else {
-    resultsEl.innerHTML = `<div class="search-no-result">No results found for "${val}"</div>`;
-    resultsEl.classList.add('open');
-  }
+  // Wait 400ms after user stops typing before searching
+  searchTimeout = setTimeout(async () => {
+    try {
+      const res = await fetch(`/.netlify/functions/finnhub?type=search&query=${encodeURIComponent(q)}`);
+      const data = await res.json();
+
+      if(!data.result || data.result.length === 0) {
+        resultsEl.innerHTML = `<div class="search-no-result">No results found for "${q}"</div>`;
+        return;
+      }
+
+      // Show all common stocks, limit to 6
+      const stocks = data.result
+        .filter(r => r.type === 'Common Stock')
+        .slice(0, 6);
+
+      resultsEl.innerHTML = stocks.map(s => `
+        <div class="search-result-item" onclick="searchAndShowStock('${s.symbol}','${s.description}')">
+          <div class="sri-ticker">${s.displaySymbol}</div>
+          <div class="sri-name">${s.description}</div>
+          <div class="sri-sector">${s.type}</div>
+        </div>`).join('');
+
+    } catch(err) {
+      resultsEl.innerHTML = `<div class="search-no-result">Search failed — try again</div>`;
+    }
+  }, 400);
 }
 
 function showSearchResults(matches) {
