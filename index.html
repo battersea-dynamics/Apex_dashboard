@@ -675,6 +675,105 @@ body::before {
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+/* SEARCH */
+.search-wrap {
+  position:relative;
+  flex:1;
+  max-width:320px;
+}
+
+.search-input {
+  width:100%;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:7px 14px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--text);
+  outline:none;
+  transition:all 0.2s;
+}
+
+.search-input::placeholder { color:var(--text3); }
+.search-input:focus { border-color:rgba(0,255,224,0.3); background:var(--bg4); box-shadow:0 0 0 2px rgba(0,255,224,0.05); }
+
+.search-results {
+  position:absolute;
+  top:calc(100% + 6px);
+  left:0;
+  right:0;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  z-index:100;
+  overflow:hidden;
+  display:none;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+
+.search-results.open { display:block; }
+
+.search-result-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  cursor:pointer;
+  border-bottom:1px solid var(--border);
+  transition:background 0.1s;
+}
+
+.search-result-item:last-child { border-bottom:none; }
+.search-result-item:hover { background:rgba(0,255,224,0.05); }
+
+.sri-ticker {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  font-weight:700;
+  color:var(--accent);
+  min-width:50px;
+}
+
+.sri-name { font-size:12px; color:var(--text2); flex:1; }
+.sri-sector { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+
+.search-loading {
+  padding:12px 14px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--accent);
+  animation:scanPulse 1.5s infinite;
+}
+
+.search-no-result {
+  padding:12px 14px;
+  font-size:11px;
+  color:var(--text3);
+}
+
+/* WATCHLIST SIDEBAR ITEMS */
+.wl-item {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 20px;
+  cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  transition:background 0.15s;
+}
+
+.wl-item:hover { background:rgba(255,255,255,0.02); }
+.wl-item.active { background:rgba(0,255,224,0.04); border-left:2px solid var(--accent); padding-left:18px; }
+
+.wl-ticker { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:var(--text); min-width:44px; }
+.wl-price { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text2); flex:1; }
+.wl-change { font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; }
+.wl-change.up { color:var(--up); }
+.wl-change.dn { color:var(--down); }
+.wl-remove { font-size:12px; color:var(--text3); margin-left:4px; opacity:0; transition:opacity 0.15s; }
+.wl-item:hover .wl-remove { opacity:1; }
 </style>
 </head>
 <body>
@@ -723,6 +822,16 @@ body::before {
       </div>
     </div>
 
+    <!-- WATCHLIST SECTION -->
+    <div class="sidebar-section" id="watchlistSection" style="flex:1;overflow-y:auto;">
+      <div class="sidebar-label">⭐ My Watchlist</div>
+      <div id="watchlistSidebar">
+        <div style="padding:8px 20px;font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;">
+          Search for stocks to add
+        </div>
+      </div>
+    </div>
+
     <div class="sidebar-bottom">
       <div class="market-status">
         <div class="status-dot"></div>
@@ -744,6 +853,13 @@ body::before {
     <div class="topbar">
       <div class="topbar-sector" id="topbarSector">SCANNING: <span>BIOTECH</span></div>
       <div class="scan-badge">⬡ LIVE SCAN</div>
+
+      <!-- SEARCH BAR -->
+      <div class="search-wrap">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search company or ticker..." autocomplete="off" oninput="onSearchInput(this.value)" onkeydown="onSearchKey(event)"/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+
       <div class="topbar-right">
         <span class="sort-label">Sort:</span>
         <div class="sort-btn active" onclick="sortCards('score',this)">Score</div>
@@ -1055,31 +1171,7 @@ function selectStock(ticker) {
     </div>`;
 }
 
-// ── SECTOR SELECT ─────────────────────────────────────────────────────────────
-function selectSector(sector, el) {
-  currentSector = sector;
-  document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
 
-  const names = {biotech:'BIOTECH',ai:'ARTIFICIAL INTELLIGENCE',tech:'TECHNOLOGY',finance:'FINANCE',energy:'ENERGY',defence:'DEFENCE',consumer:'CONSUMER',commodities:'COMMODITIES'};
-  document.getElementById('topbarSector').innerHTML = `SCANNING: <span>${names[sector]||sector.toUpperCase()}</span>`;
-
-  // Clear detail
-  document.getElementById('detailPanel').innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;opacity:0.3;"><div style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;color:var(--accent);">APEX</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:2px;">SELECT A STOCK TO ANALYSE</div></div>`;
-
-  const stocks = stockDB[sector] || [];
-  renderSummary(stocks);
-  renderCards(stocks);
-}
-
-function sortCards(sort, el) {
-  currentSort = sort;
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  const stocks = stockDB[currentSector] || [];
-  renderSummary(stocks);
-  renderCards(stocks);
-}
 
 // ── CLOCK ─────────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -1087,7 +1179,7 @@ function updateClock() {
   document.getElementById('clock').textContent = now.toUTCString().slice(17,25) + ' UTC';
 }
 
-// ── FETCH REAL PRICES ─────────────────────────────────────────────────────────
+// ── FETCH REAL PRICE ──────────────────────────────────────────────────────────
 async function fetchRealPrice(symbol) {
   try {
     const res = await fetch(`/.netlify/functions/finnhub?symbol=${symbol}&type=quote`);
@@ -1099,6 +1191,27 @@ async function fetchRealPrice(symbol) {
   }
 }
 
+// ── FETCH REAL NEWS ───────────────────────────────────────────────────────────
+async function fetchRealNews(symbol) {
+  try {
+    const res = await fetch(`/.netlify/functions/finnhub?symbol=${symbol}&type=news`);
+    const data = await res.json();
+    if(!Array.isArray(data)) return null;
+    return data.slice(0,4).map(n => {
+      const hl = (n.headline||'').toLowerCase();
+      const pos = ['surge','beat','win','rise','jump','strong','record','approval','growth','gain','upgrade'];
+      const neg = ['fall','drop','miss','decline','cut','loss','crash','disappoint','concern','risk','downgrade'];
+      const s = pos.some(w=>hl.includes(w)) ? 'pos' : neg.some(w=>hl.includes(w)) ? 'neg' : 'neu';
+      const ago = Math.round((Date.now()/1000 - n.datetime)/3600);
+      const t = ago < 1 ? 'Just now' : ago === 1 ? '1h ago' : ago < 24 ? ago+'h ago' : Math.round(ago/24)+'d ago';
+      return { t, s, h: n.headline };
+    });
+  } catch(err) {
+    return null;
+  }
+}
+
+// ── UPDATE REAL PRICES ────────────────────────────────────────────────────────
 async function updateRealPrices(stocks) {
   for(const stock of stocks) {
     const data = await fetchRealPrice(stock.ticker);
@@ -1112,29 +1225,368 @@ async function updateRealPrices(stocks) {
   }
 }
 
+// ── WATCHLIST ─────────────────────────────────────────────────────────────────
+let watchlist = JSON.parse(localStorage.getItem('apexWatchlist') || '[]');
+
+function saveWatchlist() {
+  localStorage.setItem('apexWatchlist', JSON.stringify(watchlist));
+}
+
+function addToWatchlist(stock) {
+  if(watchlist.find(w => w.ticker === stock.ticker)) return;
+  watchlist.push({ ticker:stock.ticker, name:stock.name, price:stock.price, change:stock.change, sector:stock.sector||'search' });
+  saveWatchlist();
+  renderWatchlistSidebar();
+}
+
+function removeFromWatchlist(ticker, e) {
+  e.stopPropagation();
+  watchlist = watchlist.filter(w => w.ticker !== ticker);
+  saveWatchlist();
+  renderWatchlistSidebar();
+}
+
+function renderWatchlistSidebar() {
+  const el = document.getElementById('watchlistSidebar');
+  if(watchlist.length === 0) {
+    el.innerHTML = `<div style="padding:8px 20px;font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;">Search for stocks to add</div>`;
+    return;
+  }
+  el.innerHTML = watchlist.map(w => {
+    const up = w.change >= 0;
+    return `<div class="wl-item" onclick="selectWatchlistStock('${w.ticker}')">
+      <div class="wl-ticker">${w.ticker}</div>
+      <div class="wl-price">$${w.price ? w.price.toFixed(2) : '—'}</div>
+      <div class="wl-change ${up?'up':'dn'}">${up?'+':''}${w.change ? w.change.toFixed(2) : '0'}%</div>
+      <div class="wl-remove" onclick="removeFromWatchlist('${w.ticker}',event)">✕</div>
+    </div>`;
+  }).join('');
+}
+
+async function selectWatchlistStock(ticker) {
+  // Check if it's already in stockDB
+  for(const sector of Object.values(stockDB)) {
+    const found = sector.find(s => s.ticker === ticker);
+    if(found) { selectStock(ticker); return; }
+  }
+  // Otherwise fetch from Finnhub and show detail
+  await searchAndShowStock(ticker);
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+
+// Built-in symbol lookup database (covers major stocks on Revolut)
+const symbolDB = [
+  {ticker:'AAPL',name:'Apple Inc',sector:'tech'},{ticker:'MSFT',name:'Microsoft Corporation',sector:'ai'},
+  {ticker:'GOOGL',name:'Alphabet Inc',sector:'tech'},{ticker:'AMZN',name:'Amazon.com Inc',sector:'consumer'},
+  {ticker:'META',name:'Meta Platforms',sector:'ai'},{ticker:'NVDA',name:'NVIDIA Corporation',sector:'ai'},
+  {ticker:'TSLA',name:'Tesla Inc',sector:'tech'},{ticker:'NFLX',name:'Netflix Inc',sector:'consumer'},
+  {ticker:'AMD',name:'Advanced Micro Devices',sector:'tech'},{ticker:'INTC',name:'Intel Corporation',sector:'tech'},
+  {ticker:'PYPL',name:'PayPal Holdings',sector:'finance'},{ticker:'UBER',name:'Uber Technologies',sector:'tech'},
+  {ticker:'LYFT',name:'Lyft Inc',sector:'tech'},{ticker:'SPOT',name:'Spotify Technology',sector:'consumer'},
+  {ticker:'SHOP',name:'Shopify Inc',sector:'tech'},{ticker:'SQ',name:'Block Inc',sector:'finance'},
+  {ticker:'COIN',name:'Coinbase Global',sector:'finance'},{ticker:'PLTR',name:'Palantir Technologies',sector:'ai'},
+  {ticker:'SOUN',name:'SoundHound AI',sector:'ai'},{ticker:'RIVN',name:'Rivian Automotive',sector:'tech'},
+  {ticker:'LCID',name:'Lucid Group',sector:'tech'},{ticker:'NIO',name:'NIO Inc',sector:'tech'},
+  {ticker:'BABA',name:'Alibaba Group',sector:'tech'},{ticker:'JD',name:'JD.com Inc',sector:'consumer'},
+  {ticker:'MRNA',name:'Moderna Inc',sector:'biotech'},{ticker:'BNTX',name:'BioNTech SE',sector:'biotech'},
+  {ticker:'PFE',name:'Pfizer Inc',sector:'biotech'},{ticker:'JNJ',name:'Johnson & Johnson',sector:'biotech'},
+  {ticker:'ABBV',name:'AbbVie Inc',sector:'biotech'},{ticker:'LLY',name:'Eli Lilly',sector:'biotech'},
+  {ticker:'RXRX',name:'Recursion Pharmaceuticals',sector:'biotech'},{ticker:'BEAM',name:'Beam Therapeutics',sector:'biotech'},
+  {ticker:'CRSP',name:'CRISPR Therapeutics',sector:'biotech'},{ticker:'NTLA',name:'Intellia Therapeutics',sector:'biotech'},
+  {ticker:'REGN',name:'Regeneron Pharmaceuticals',sector:'biotech'},{ticker:'VRTX',name:'Vertex Pharmaceuticals',sector:'biotech'},
+  {ticker:'GSK',name:'GSK plc',sector:'biotech'},{ticker:'AZN',name:'AstraZeneca plc',sector:'biotech'},
+  {ticker:'JPM',name:'JPMorgan Chase',sector:'finance'},{ticker:'BAC',name:'Bank of America',sector:'finance'},
+  {ticker:'GS',name:'Goldman Sachs',sector:'finance'},{ticker:'MS',name:'Morgan Stanley',sector:'finance'},
+  {ticker:'HSBA',name:'HSBC Holdings',sector:'finance'},{ticker:'BCS',name:'Barclays plc',sector:'finance'},
+  {ticker:'BP',name:'BP plc',sector:'energy'},{ticker:'SHEL',name:'Shell plc',sector:'energy'},
+  {ticker:'XOM',name:'ExxonMobil',sector:'energy'},{ticker:'CVX',name:'Chevron',sector:'energy'},
+  {ticker:'ENPH',name:'Enphase Energy',sector:'energy'},{ticker:'FSLR',name:'First Solar',sector:'energy'},
+  {ticker:'LMT',name:'Lockheed Martin',sector:'defence'},{ticker:'RTX',name:'RTX Corporation',sector:'defence'},
+  {ticker:'BA',name:'Boeing',sector:'defence'},{ticker:'NOC',name:'Northrop Grumman',sector:'defence'},
+  {ticker:'GOLD',name:'Barrick Gold Corp',sector:'commodities'},{ticker:'FCX',name:'Freeport-McMoRan',sector:'commodities'},
+  {ticker:'NKE',name:'Nike Inc',sector:'consumer'},{ticker:'SBUX',name:'Starbucks',sector:'consumer'},
+  {ticker:'MCD',name:'McDonalds',sector:'consumer'},{ticker:'DIS',name:'Walt Disney',sector:'consumer'},
+  {ticker:'AFRM',name:'Affirm Holdings',sector:'finance'},{ticker:'DAVE',name:'Dave Inc',sector:'finance'},
+  {ticker:'SOFI',name:'SoFi Technologies',sector:'finance'},{ticker:'HOOD',name:'Robinhood Markets',sector:'finance'},
+];
+
+let searchTimeout = null;
+
+function onSearchInput(val) {
+  clearTimeout(searchTimeout);
+  const q = val.trim().toLowerCase();
+  const resultsEl = document.getElementById('searchResults');
+
+  if(q.length < 1) { resultsEl.classList.remove('open'); return; }
+
+  // Filter from local symbolDB first
+  const matches = symbolDB.filter(s =>
+    s.ticker.toLowerCase().startsWith(q) ||
+    s.name.toLowerCase().includes(q)
+  ).slice(0, 6);
+
+  if(matches.length > 0) {
+    showSearchResults(matches);
+  } else {
+    resultsEl.innerHTML = `<div class="search-no-result">No results found for "${val}"</div>`;
+    resultsEl.classList.add('open');
+  }
+}
+
+function showSearchResults(matches) {
+  const el = document.getElementById('searchResults');
+  el.innerHTML = matches.map(m => `
+    <div class="search-result-item" onclick="searchAndShowStock('${m.ticker}')">
+      <div class="sri-ticker">${m.ticker}</div>
+      <div class="sri-name">${m.name}</div>
+      <div class="sri-sector">${m.sector}</div>
+    </div>`).join('');
+  el.classList.add('open');
+}
+
+function onSearchKey(e) {
+  if(e.key === 'Escape') {
+    document.getElementById('searchResults').classList.remove('open');
+    document.getElementById('searchInput').value = '';
+  }
+}
+
+// Close search on outside click
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.search-wrap')) {
+    document.getElementById('searchResults').classList.remove('open');
+  }
+});
+
+async function searchAndShowStock(ticker) {
+  // Close search UI
+  document.getElementById('searchResults').classList.remove('open');
+  document.getElementById('searchInput').value = '';
+
+  // Show loading in detail panel
+  document.getElementById('detailPanel').innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;">
+      <div class="scan-spinner"></div>
+      <div class="scan-text">LOADING ${ticker}...</div>
+    </div>`;
+
+  // Check if already in stockDB
+  for(const [sector, stocks] of Object.entries(stockDB)) {
+    const found = stocks.find(s => s.ticker === ticker);
+    if(found) {
+      // Switch to that sector and select
+      const sectorBtn = document.querySelector(`.sector-btn[onclick*="${sector}"]`);
+      if(sectorBtn) selectSector(sector, sectorBtn);
+      setTimeout(() => selectStock(ticker), 800);
+      return;
+    }
+  }
+
+  // Fetch real data from Finnhub
+  const [priceData, newsData] = await Promise.all([
+    fetchRealPrice(ticker),
+    fetchRealNews(ticker)
+  ]);
+
+  // Find name from symbolDB
+  const meta = symbolDB.find(s => s.ticker === ticker) || { name: ticker, sector:'search' };
+
+  if(!priceData || !priceData.c || priceData.c === 0) {
+    document.getElementById('detailPanel').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;opacity:0.5;">
+        <div style="font-size:32px">⚠️</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--down);">NO DATA FOUND FOR ${ticker}</div>
+        <div style="font-size:11px;color:var(--text3);">Check the ticker symbol and try again</div>
+      </div>`;
+    return;
+  }
+
+  // Build a stock object
+  const up = priceData.dp >= 0;
+  const absChange = Math.abs(priceData.dp);
+  const stock = {
+    ticker,
+    name: meta.name,
+    price: priceData.c,
+    change: priceData.dp,
+    mktcap: '—',
+    sector: meta.sector,
+    scores: {
+      catalyst: 10,
+      analyst:  absChange > 5 ? 16 : absChange > 2 ? 12 : 8,
+      news:     newsData ? scoreNews(newsData) : 8,
+      volume:   absChange > 5 ? 13 : absChange > 2 ? 9 : 5,
+      social:   absChange > 5 ? 12 : 7,
+    },
+    catalystDays: 99,
+    catalystType: 'EARNINGS',
+    catalystText: 'Check earnings calendar',
+    window: absChange > 5 ? 'moving' : absChange > 2 ? 'pre-move' : 'pre-move',
+    news: newsData || [{t:'—',s:'neu',h:'No recent news available — check financial news sites for latest updates'}],
+    tags: buildTags(priceData, newsData),
+  };
+
+  // Add to watchlist
+  addToWatchlist(stock);
+
+  // Show detail panel
+  selectSearchStock(stock);
+}
+
+function scoreNews(news) {
+  if(!news || news.length === 0) return 8;
+  const pos = news.filter(n => n.s === 'pos').length;
+  const neg = news.filter(n => n.s === 'neg').length;
+  if(pos > neg) return 14 + pos;
+  if(neg > pos) return Math.max(4, 10 - neg * 2);
+  return 10;
+}
+
+function buildTags(priceData, news) {
+  const tags = [];
+  if(Math.abs(priceData.dp) > 3) tags.push('volume');
+  if(news && news.filter(n=>n.s==='pos').length >= 2) tags.push('news');
+  if(Math.abs(priceData.dp) > 5) tags.push('social');
+  if(tags.length === 0) tags.push('analyst');
+  return tags;
+}
+
+function selectSearchStock(s) {
+  const score = totalScore(s);
+  const up = s.change >= 0;
+  const scoreColor = score >= 70 ? 'var(--up)' : score >= 50 ? 'var(--moving)' : 'var(--down)';
+  const signal = score >= 70 ? {cls:'buy',txt:'STRONG BUY'} : score >= 55 ? {cls:'buy',txt:'BUY'} : score >= 40 ? {cls:'hold',txt:'HOLD'} : {cls:'sell',txt:'SELL'};
+
+  const windowInfo = {
+    'pre-move': { title:'🟢 PRE-MOVE WINDOW', desc:'Signals suggest this stock has not yet made its major move. Worth watching closely.', color:'var(--pre)' },
+    'moving':   { title:'🟡 CURRENTLY MOVING', desc:'This stock is already in motion today. Entry requires faster decision-making.', color:'var(--moving)' },
+    'late':     { title:'🔴 LATE — ALREADY MOVED', desc:'Already made a significant move today. Consider waiting for a pullback.', color:'var(--late)' },
+  };
+
+  const wi = windowInfo[s.window] || windowInfo['pre-move'];
+
+  const breakdownRows = [
+    { source:'Catalyst Signal', pts:s.scores.catalyst, max:30, color:'var(--warn)', detail:'Manual check needed' },
+    { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: s.scores.analyst>=16?'Strong':'Moderate' },
+    { source:'News Sentiment', pts:s.scores.news, max:20, color:'#c084fc', detail: s.scores.news>=15?'Positive':'Mixed' },
+    { source:'Volume Activity', pts:s.scores.volume, max:15, color:'#4da6ff', detail: s.scores.volume>=12?'Above average':'Normal' },
+    { source:'Social Buzz', pts:s.scores.social, max:15, color:'#f472b6', detail: s.scores.social>=12?'Rising':'Low' },
+  ];
+
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <div class="detail-ticker" style="color:${wi.color}">${s.ticker}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--accent);background:rgba(0,255,224,0.08);border:1px solid rgba(0,255,224,0.2);padding:2px 8px;border-radius:4px;">⭐ WATCHLIST</div>
+      </div>
+      <div class="detail-name">${s.name}</div>
+      <div class="detail-price" style="color:${up?'var(--up)':'var(--down)'}">\$${s.price.toFixed(2)}</div>
+      <div class="detail-change" style="color:${up?'var(--up)':'var(--down)'}">${up?'+':''}${s.change.toFixed(2)}% today</div>
+    </div>
+
+    <div class="total-score-block">
+      <div>
+        <div class="total-label">Opportunity Score</div>
+        <div class="total-score-val" style="color:${scoreColor}">${score}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3)">OUT OF 100</div>
+      </div>
+      <div class="total-signal ${signal.cls}">${signal.txt}</div>
+    </div>
+
+    <div class="window-explain">
+      <div class="window-title" style="color:${wi.color}">${wi.title}</div>
+      <div class="window-desc">${wi.desc}</div>
+    </div>
+
+    <div class="score-breakdown">
+      <div class="section-title">Score Breakdown</div>
+      ${breakdownRows.map(r=>`
+      <div class="breakdown-row">
+        <div>
+          <div class="br-source">${r.source}</div>
+          <div style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-top:1px">${r.detail}</div>
+        </div>
+        <div class="br-track"><div class="br-fill" style="width:${(r.pts/r.max)*100}%;background:${r.color}"></div></div>
+        <div class="br-pts" style="color:${r.color}">${r.pts}/${r.max}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="detail-news">
+      <div class="section-title">Latest News</div>
+      ${s.news.map(n=>`
+      <div class="detail-news-item">
+        <div class="dni-meta">
+          <span class="dni-time">${n.t}</span>
+          <span class="dni-sent ${n.s}">${n.s==='pos'?'Positive':n.s==='neg'?'Negative':'Neutral'}</span>
+        </div>
+        <div class="dni-headline">${n.h}</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+// ── SECTOR SELECT (updated to fetch real prices) ───────────────────────────────
+function selectSector(sector, el) {
+  currentSector = sector;
+  document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  const names = {biotech:'BIOTECH',ai:'ARTIFICIAL INTELLIGENCE',tech:'TECHNOLOGY',finance:'FINANCE',energy:'ENERGY',defence:'DEFENCE',consumer:'CONSUMER',commodities:'COMMODITIES'};
+  document.getElementById('topbarSector').innerHTML = `SCANNING: <span>${names[sector]||sector.toUpperCase()}</span>`;
+
+  document.getElementById('detailPanel').innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;opacity:0.3;"><div style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;color:var(--accent);">APEX</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:2px;">SELECT A STOCK TO ANALYSE</div></div>`;
+
+  const stocks = stockDB[sector] || [];
+  renderSummary(stocks);
+  renderCards(stocks);
+
+  // Fetch real prices for this sector
+  updateRealPrices(stocks).then(() => {
+    renderSummary(stocks);
+    renderCards(stocks);
+  });
+}
+
+function sortCards(sort, el) {
+  currentSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const stocks = stockDB[currentSector] || [];
+  renderSummary(stocks);
+  renderCards(stocks);
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   renderTape();
   updateClock();
   setInterval(updateClock, 1000);
+  renderWatchlistSidebar();
 
   const initStocks = stockDB.biotech;
   renderSummary(initStocks);
   renderCards(initStocks);
 
-  // Fetch real prices in background
+  // Fetch real prices
   console.log('Fetching real prices...');
   await updateRealPrices(initStocks);
-  console.log('Real prices loaded — refreshing cards...');
+  console.log('Real prices loaded!');
   renderSummary(initStocks);
   renderCards(initStocks);
 
-  // Refresh prices every 60 seconds
+  // Refresh watchlist prices every 60 seconds
   setInterval(async () => {
     const stocks = stockDB[currentSector];
     await updateRealPrices(stocks);
     renderSummary(stocks);
     renderCards(stocks);
+    // Update watchlist prices too
+    for(const w of watchlist) {
+      const d = await fetchRealPrice(w.ticker);
+      if(d && d.c) { w.price = d.c; w.change = d.dp; }
+    }
+    saveWatchlist();
+    renderWatchlistSidebar();
   }, 60000);
 }
 
