@@ -1084,39 +1084,137 @@ async function selectStock(ticker) {
   const card = document.getElementById('card-'+ticker);
   if(card) card.classList.add('selected');
 
-  // Find stock data
+  // Find stock in current sector
   const allStocks = stockDB[currentSector] || [];
   const s = allStocks.find(x => x.ticker === ticker);
   if(!s) return;
 
-  const score = totalScore(s);
   const up = s.change >= 0;
+
+  // Show loading state immediately
+  document.getElementById('detailPanel').innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;">
+      <div class="scan-spinner"></div>
+      <div class="scan-text">LOADING ${ticker}...</div>
+    </div>`;
+
+  // Fetch all real data in parallel
+  const [profileData, earningsData, newsData] = await Promise.all([
+    fetchProfile(ticker),
+    fetchEarnings(ticker),
+    fetchRealNews(ticker)
+  ]);
+
+  // Only update if user still looking at same stock
+  if(selectedTicker !== ticker) return;
+
+  // ── REAL PROFILE DATA ──────────────────────────────────────────────────────
+  const companyName = profileData?.name || s.name;
+  const industry = profileData?.finnhubIndustry || s.sector;
+  const logo = profileData?.logo || null;
+  const mktCap = profileData?.marketCapitalization 
+    ? formatMarketCap(profileData.marketCapitalization)
+    : s.mktcap;
+  const exchange = profileData?.exchange || '—';
+
+  // ── REAL EARNINGS DATE ─────────────────────────────────────────────────────
+  let catalystDays = 99;
+  let catalystText = 'No upcoming earnings found';
+  let catalystType = 'EARNINGS';
+  let hasRealCatalyst = false;
+
+  if(earningsData?.earningsCalendar?.length > 0) {
+    const next = earningsData.earningsCalendar[0];
+    const earnDate = new Date(next.date);
+    const now = new Date();
+    catalystDays = Math.ceil((earnDate - now) / (1000*60*60*24));
+    catalystText = `Q${next.quarter} ${next.year} Earnings — ${next.date}`;
+    catalystType = 'EARNINGS';
+    hasRealCatalyst = true;
+  }
+
+  // ── REAL NEWS SENTIMENT SCORE ──────────────────────────────────────────────
+  let newsScore = 8;
+  let realNews = newsData || [];
+  if(realNews.length > 0) {
+    const pos = realNews.filter(n => n.s === 'pos').length;
+    const neg = realNews.filter(n => n.s === 'neg').length;
+    newsScore = pos > neg ? Math.min(20, 12 + pos * 2) : Math.max(3, 10 - neg * 2);
+  }
+
+  // ── REAL PRICE RANGE SCORE ─────────────────────────────────────────────────
+  const priceRange = s.high && s.low 
+    ? ((s.high - s.low) / s.low * 100).toFixed(2)
+    : Math.abs(s.change).toFixed(2);
+  const volumeScore = Math.abs(s.change) > 5 ? 14 :
+                      Math.abs(s.change) > 3 ? 11 :
+                      Math.abs(s.change) > 1 ? 8 : 5;
+
+  // ── REAL CATALYST SCORE ────────────────────────────────────────────────────
+  const catalystScore = hasRealCatalyst
+    ? catalystDays <= 3  ? 29
+    : catalystDays <= 7  ? 25
+    : catalystDays <= 14 ? 20
+    : catalystDays <= 30 ? 15
+    : 8
+    : 5;
+
+  // ── UPDATE SCORES WITH REAL DATA ───────────────────────────────────────────
+  s.scores.catalyst = catalystScore;
+  s.scores.news = newsScore;
+  s.scores.volume = volumeScore;
+
+  // ── RECALCULATE WINDOW ─────────────────────────────────────────────────────
+  const score = totalScore(s);
   const scoreColor = score >= 70 ? 'var(--up)' : score >= 50 ? 'var(--moving)' : 'var(--down)';
-  const signal = score >= 70 ? {cls:'buy',txt:'STRONG BUY'} : score >= 55 ? {cls:'buy',txt:'BUY'} : score >= 40 ? {cls:'hold',txt:'HOLD'} : {cls:'sell',txt:'SELL'};
+  const signal = score >= 70 ? {cls:'buy',txt:'STRONG BUY'} 
+               : score >= 55 ? {cls:'buy',txt:'BUY'} 
+               : score >= 40 ? {cls:'hold',txt:'HOLD'} 
+               : {cls:'sell',txt:'SELL'};
+
+  // Recalculate window based on real data
+  if(hasRealCatalyst) {
+    s.window = catalystDays <= 7 ? 'moving' 
+             : catalystDays <= 30 ? 'pre-move' 
+             : 'pre-move';
+  }
 
   const windowInfo = {
-    'pre-move': { title:'🟢 PRE-MOVE WINDOW', desc:'This stock has not yet made its major move. Catalyst is upcoming and signals are building quietly. This is typically the ideal entry window — before the crowd arrives.', color:'var(--pre)' },
-    'moving':   { title:'🟡 CURRENTLY MOVING', desc:'This stock is already in motion. Entry is still possible if momentum is strong and catalyst is imminent, but the easy gains may already be priced in. Requires faster decision-making.', color:'var(--moving)' },
-    'late':     { title:'🔴 LATE — ALREADY MOVED', desc:'This stock has already made a significant move. Entering now carries higher risk of buying the top. Consider waiting for a pullback or move on to the next opportunity.', color:'var(--late)' },
+    'pre-move': { title:'🟢 PRE-MOVE WINDOW', desc:'Catalyst is upcoming and signals are building. This is typically the ideal entry window — before the crowd arrives.', color:'var(--pre)' },
+    'moving':   { title:'🟡 CURRENTLY MOVING', desc:'Earnings are imminent. Entry still possible but requires faster decision-making. Risk is higher.', color:'var(--moving)' },
+    'late':     { title:'🔴 LATE — ALREADY MOVED', desc:'This stock has already made a significant move. Consider waiting for a pullback.', color:'var(--late)' },
   };
 
-  const wi = windowInfo[s.window];
+  const wi = windowInfo[s.window] || windowInfo['pre-move'];
 
   const breakdownRows = [
-    { source:'Catalyst Signal', pts:s.scores.catalyst, max:30, color:'var(--warn)', detail:`${s.catalystDays}d to ${s.catalystType}` },
-    { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: s.scores.analyst>=16?'Strong BUY':s.scores.analyst>=12?'BUY':'HOLD' },
-    { source:'News Sentiment', pts:s.scores.news, max:20, color:'#c084fc', detail: s.scores.news>=15?'Positive':'Mixed' },
-    { source:'Volume Activity', pts:s.scores.volume, max:15, color:'#4da6ff', detail: s.scores.volume>=12?'Spike detected':'Normal' },
-    { source:'Social Buzz', pts:s.scores.social, max:15, color:'#f472b6', detail: s.scores.social>=12?'Rising fast':'Moderate' },
+    { source:'Catalyst (Earnings)', pts:s.scores.catalyst, max:30, color:'var(--warn)',   detail: hasRealCatalyst ? `${catalystDays}d to earnings` : 'No upcoming earnings' },
+    { source:'Analyst Consensus',   pts:s.scores.analyst,  max:20, color:'var(--accent)', detail: s.scores.analyst>=16?'Strong BUY':s.scores.analyst>=12?'BUY':'HOLD' },
+    { source:'News Sentiment',      pts:s.scores.news,     max:20, color:'#c084fc',       detail: newsScore>=15?'Positive':newsScore>=10?'Mixed':'Negative' },
+    { source:'Price Volatility',    pts:s.scores.volume,   max:15, color:'#4da6ff',       detail: `${Math.abs(s.change).toFixed(2)}% range today` },
+    { source:'Social Buzz',         pts:s.scores.social,   max:15, color:'#f472b6',       detail: s.scores.social>=12?'Rising fast':'Moderate' },
   ];
 
-  // Show detail panel immediately with loading news
+  // ── RENDER DETAIL PANEL ────────────────────────────────────────────────────
   document.getElementById('detailPanel').innerHTML = `
     <div class="detail-header">
-      <div class="detail-ticker" style="color:${wi.color}">${s.ticker}</div>
-      <div class="detail-name">${s.name} · ${s.mktcap} mkt cap</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        ${logo ? `<img src="${logo}" style="width:32px;height:32px;border-radius:6px;object-fit:contain;background:#fff;padding:2px">` : ''}
+        <div>
+          <div class="detail-ticker" style="color:${wi.color}">${ticker}</div>
+          <div class="detail-name">${companyName}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:3px">${exchange}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:3px">${industry}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:3px">Mkt Cap: ${mktCap}</span>
+      </div>
       <div class="detail-price" style="color:${up?'var(--up)':'var(--down)'}">\$${s.price.toFixed(2)}</div>
-      <div class="detail-change" style="color:${up?'var(--up)':'var(--down)'}">${up?'+':''}${s.change.toFixed(2)}% today</div>
+      <div style="display:flex;gap:12px;margin-top:4px">
+        <div class="detail-change" style="color:${up?'var(--up)':'var(--down)'}">${up?'+':''}${s.change.toFixed(2)}% today</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3)">H: $${s.high||'—'} L: $${s.low||'—'}</div>
+      </div>
     </div>
 
     <div class="total-score-block">
@@ -1134,8 +1232,8 @@ async function selectStock(ticker) {
     </div>
 
     <div class="score-breakdown">
-      <div class="section-title">Score Breakdown</div>
-      ${breakdownRows.map(r => `
+      <div class="section-title">Score Breakdown <span style="color:var(--accent);font-size:9px;margin-left:6px">● LIVE DATA</span></div>
+      ${breakdownRows.map(r=>`
       <div class="breakdown-row">
         <div>
           <div class="br-source">${r.source}</div>
@@ -1146,56 +1244,67 @@ async function selectStock(ticker) {
       </div>`).join('')}
     </div>
 
-    ${s.catalystDays <= 14 ? `
+    ${hasRealCatalyst ? `
     <div style="padding:12px 18px;border-bottom:1px solid var(--border);background:rgba(255,184,0,0.04)">
-      <div class="section-title">Upcoming Catalyst</div>
+      <div class="section-title">Next Earnings <span style="color:var(--accent);font-size:9px;margin-left:6px">● REAL DATE</span></div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
-        <div style="font-size:22px">${s.catalystType==='FDA'?'💊':s.catalystType==='EARNINGS'?'📊':'📅'}</div>
+        <div style="font-size:22px">📊</div>
         <div>
-          <div style="font-size:13px;font-weight:600;color:var(--warn)">${s.catalystText}</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">${s.catalystDays===1?'Tomorrow — very high urgency':s.catalystDays<=5?s.catalystDays+' days — high urgency':s.catalystDays+' days — moderate urgency'}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--warn)">${catalystText}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">
+            ${catalystDays <= 1 ? 'Tomorrow — very high urgency' 
+            : catalystDays <= 5 ? catalystDays+' days — high urgency'
+            : catalystDays <= 14 ? catalystDays+' days — moderate urgency'
+            : catalystDays+' days away'}
+          </div>
         </div>
       </div>
     </div>` : ''}
 
     <div class="detail-news" id="newsSection-${ticker}">
-      <div class="section-title">Latest News</div>
-      <div style="display:flex;align-items:center;gap:10px;padding:12px 0;">
-        <div class="scan-spinner" style="width:20px;height:20px;border-width:2px"></div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);">Fetching live news...</div>
-      </div>
-    </div>`;
-
-  // Fetch real news in background
-  const realNews = await fetchRealNews(ticker);
-
-  // Only update if user is still looking at same stock
-  if(selectedTicker !== ticker) return;
-
-  const newsSection = document.getElementById(`newsSection-${ticker}`);
-  if(!newsSection) return;
-
-  if(realNews && realNews.length > 0) {
-    // Update news score based on real news
-    const posCount = realNews.filter(n => n.s === 'pos').length;
-    const negCount = realNews.filter(n => n.s === 'neg').length;
-    s.scores.news = posCount > negCount ? 14 + posCount : Math.max(4, 10 - negCount * 2);
-
-    newsSection.innerHTML = `
       <div class="section-title">Latest News <span style="color:var(--accent);font-size:9px;margin-left:6px">● LIVE</span></div>
-      ${realNews.map(n => `
-      <div class="detail-news-item">
-        <div class="dni-meta">
-          <span class="dni-time">${n.t}</span>
-          <span class="dni-sent ${n.s}">${n.s==='pos'?'Positive':n.s==='neg'?'Negative':'Neutral'}</span>
-        </div>
-        <div class="dni-headline">${n.h}</div>
-      </div>`).join('')}`;
-  } else {
-    newsSection.innerHTML = `
-      <div class="section-title">Latest News</div>
-      <div style="padding:12px 0;font-size:11px;color:var(--text3);">No recent news found for ${ticker}</div>`;
+      ${realNews.length > 0 
+        ? realNews.map(n=>`
+          <div class="detail-news-item">
+            <div class="dni-meta">
+              <span class="dni-time">${n.t}</span>
+              <span class="dni-sent ${n.s}">${n.s==='pos'?'Positive':n.s==='neg'?'Negative':'Neutral'}</span>
+            </div>
+            <div class="dni-headline">${n.h}</div>
+          </div>`).join('')
+        : `<div style="padding:12px 0;font-size:11px;color:var(--text3)">No recent news found for ${ticker}</div>`
+      }
+    </div>`;
+}
+
+// ── FETCH PROFILE ─────────────────────────────────────────────────────────────
+async function fetchProfile(symbol) {
+  try {
+    const res = await fetch(`/finnhub?symbol=${symbol}&type=profile`);
+    const data = await res.json();
+    return data;
+  } catch(err) {
+    return null;
   }
+}
+
+// ── FETCH EARNINGS ────────────────────────────────────────────────────────────
+async function fetchEarnings(symbol) {
+  try {
+    const res = await fetch(`/finnhub?symbol=${symbol}&type=earnings`);
+    const data = await res.json();
+    return data;
+  } catch(err) {
+    return null;
+  }
+}
+
+// ── FORMAT MARKET CAP ─────────────────────────────────────────────────────────
+function formatMarketCap(mc) {
+  // Finnhub returns market cap in millions
+  if(mc >= 1000000) return `$${(mc/1000000).toFixed(2)}T`;
+  if(mc >= 1000)    return `$${(mc/1000).toFixed(1)}B`;
+  return `$${mc.toFixed(0)}M`;
 }
 
 
