@@ -1209,7 +1209,7 @@ function updateClock() {
 // ── FETCH REAL PRICE ──────────────────────────────────────────────────────────
 async function fetchRealPrice(symbol) {
   try {
-    const res = await fetch(`/.netlify/functions/finnhub?symbol=${symbol}&type=quote`);
+    const res = await fetch(`https://apexdashboard.battersea-dynamics.workers.dev?symbol=${symbol}&type=quote`);
     const data = await res.json();
     return data;
   } catch(err) {
@@ -1221,7 +1221,7 @@ async function fetchRealPrice(symbol) {
 // ── FETCH REAL NEWS ───────────────────────────────────────────────────────────
 async function fetchRealNews(symbol) {
   try {
-    const res = await fetch(`/.netlify/functions/finnhub?symbol=${symbol}&type=news`);
+    const res = await fetch(`https://apexdashboard.battersea-dynamics.workers.dev?symbol=${symbol}&type=news`);
     const data = await res.json();
     if(!Array.isArray(data)) return null;
     return data.slice(0,4).map(n => {
@@ -1354,7 +1354,7 @@ function onSearchInput(val) {
   // Wait 400ms after user stops typing before searching
   searchTimeout = setTimeout(async () => {
     try {
-      const res = await fetch(`/.netlify/functions/finnhub?type=search&query=${encodeURIComponent(q)}`);
+      const res = await fetch(`https://apexdashboard.battersea-dynamics.workers.dev?type=search&query=${encodeURIComponent(q)}`);
       const data = await res.json();
 
       if(!data.result || data.result.length === 0) {
