@@ -1076,7 +1076,7 @@ function renderCards(stocks) {
 }
 
 // ── SELECT STOCK ──────────────────────────────────────────────────────────────
-function selectStock(ticker) {
+async function selectStock(ticker) {
   selectedTicker = ticker;
 
   // Highlight card
@@ -1092,7 +1092,6 @@ function selectStock(ticker) {
   const score = totalScore(s);
   const up = s.change >= 0;
   const scoreColor = score >= 70 ? 'var(--up)' : score >= 50 ? 'var(--moving)' : 'var(--down)';
-
   const signal = score >= 70 ? {cls:'buy',txt:'STRONG BUY'} : score >= 55 ? {cls:'buy',txt:'BUY'} : score >= 40 ? {cls:'hold',txt:'HOLD'} : {cls:'sell',txt:'SELL'};
 
   const windowInfo = {
@@ -1111,6 +1110,7 @@ function selectStock(ticker) {
     { source:'Social Buzz', pts:s.scores.social, max:15, color:'#f472b6', detail: s.scores.social>=12?'Rising fast':'Moderate' },
   ];
 
+  // Show detail panel immediately with loading news
   document.getElementById('detailPanel').innerHTML = `
     <div class="detail-header">
       <div class="detail-ticker" style="color:${wi.color}">${s.ticker}</div>
@@ -1158,17 +1158,44 @@ function selectStock(ticker) {
       </div>
     </div>` : ''}
 
-    <div class="detail-news">
+    <div class="detail-news" id="newsSection-${ticker}">
       <div class="section-title">Latest News</div>
-      ${s.news.map(n => `
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 0;">
+        <div class="scan-spinner" style="width:20px;height:20px;border-width:2px"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);">Fetching live news...</div>
+      </div>
+    </div>`;
+
+  // Fetch real news in background
+  const realNews = await fetchRealNews(ticker);
+
+  // Only update if user is still looking at same stock
+  if(selectedTicker !== ticker) return;
+
+  const newsSection = document.getElementById(`newsSection-${ticker}`);
+  if(!newsSection) return;
+
+  if(realNews && realNews.length > 0) {
+    // Update news score based on real news
+    const posCount = realNews.filter(n => n.s === 'pos').length;
+    const negCount = realNews.filter(n => n.s === 'neg').length;
+    s.scores.news = posCount > negCount ? 14 + posCount : Math.max(4, 10 - negCount * 2);
+
+    newsSection.innerHTML = `
+      <div class="section-title">Latest News <span style="color:var(--accent);font-size:9px;margin-left:6px">● LIVE</span></div>
+      ${realNews.map(n => `
       <div class="detail-news-item">
         <div class="dni-meta">
           <span class="dni-time">${n.t}</span>
           <span class="dni-sent ${n.s}">${n.s==='pos'?'Positive':n.s==='neg'?'Negative':'Neutral'}</span>
         </div>
         <div class="dni-headline">${n.h}</div>
-      </div>`).join('')}
-    </div>`;
+      </div>`).join('')}`;
+  } else {
+    newsSection.innerHTML = `
+      <div class="section-title">Latest News</div>
+      <div style="padding:12px 0;font-size:11px;color:var(--text3);">No recent news found for ${ticker}</div>`;
+  }
 }
 
 
