@@ -5,13 +5,12 @@ export async function onRequest(context) {
   const query = url.searchParams.get('query');
   const apiKey = context.env.FINNHUB_API_KEY;
 
-  // Date helpers
   const today = new Date();
   const pad = n => String(n).padStart(2,'0');
   const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const fromDate = fmt(today);
-  const toDate = fmt(new Date(today.getTime() + 90*24*60*60*1000)); // 90 days ahead
-  const newsFrom = fmt(new Date(today.getTime() - 7*24*60*60*1000)); // 7 days back
+  const toDate = fmt(new Date(today.getTime() + 90*24*60*60*1000));
+  const newsFrom = fmt(new Date(today.getTime() - 7*24*60*60*1000));
 
   let finnhubUrl;
   if(type === 'quote') {
@@ -30,4 +29,17 @@ export async function onRequest(context) {
 
   try {
     const response = await fetch(finnhubUrl);
-    const data = await response.text
+    const data = await response.text();
+    return new Response(data, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      }
+    });
+  } catch(err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
