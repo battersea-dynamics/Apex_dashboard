@@ -1195,7 +1195,7 @@ async function selectStock(ticker) {
                 : 3;
     socialDetail = `${socialData.bullishPct}% bullish — ${socialData.total} posts`;
   }
-  s.scores.social = socialScore;
+  s.scores.social = 0;
 
   // ── RECALCULATE WINDOW ─────────────────────────────────────────────────────
   const score = totalScore(s);
@@ -1731,7 +1731,7 @@ function selectSearchStock(s) {
     { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: analystData ? analystDetail : '⚠️ No data' },
     { source:'News Sentiment', pts:s.scores.news, max:20, color:'#c084fc', detail: s.scores.news>=15?'Positive':'Mixed' },
     { source:'Volume Activity', pts:s.scores.volume, max:15, color:'#4da6ff', detail: s.scores.volume>=12?'Above average':'Normal' },
-    { source:'Social Buzz', pts:s.scores.social, max:15, color:'#f472b6', detail: s.scores.social>=12?'Rising':'Low' },
+    { source:'Social Buzz', pts:0, max:15, color:'#f472b6', detail: '⏳ Reddit integration coming soon' },
   ];
 
   document.getElementById('detailPanel').innerHTML = `
