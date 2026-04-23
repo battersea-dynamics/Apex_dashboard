@@ -1326,6 +1326,8 @@ async function fetchSocialSentiment(symbol) {
   try {
     const res = await fetch(`/finnhub?type=social&symbol=${symbol}`);
     const data = await res.json();
+    console.log('Social fetch status:', res.status);
+    console.log('Social raw data:', JSON.stringify(data).slice(0,200));
     console.log('StockTwits data:', data.symbol, 'messages:', data.messages?.length);
     if(!data.messages || data.messages.length === 0) return null;
 
