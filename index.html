@@ -1324,7 +1324,7 @@ async function fetchProfile(symbol) {
 // ── FETCH EARNINGS ────────────────────────────────────────────────────────────
 async function fetchSocialSentiment(symbol) {
   try {
-    const res = await fetch(`https://api.stocktwits.com/api/2/streams/symbol/${symbol}.json`);
+    const res = await fetch(`/finnhub?type=social&symbol=${symbol}`);
     const data = await res.json();
     console.log('StockTwits data:', data.symbol, 'messages:', data.messages?.length);
     if(!data.messages || data.messages.length === 0) return null;
