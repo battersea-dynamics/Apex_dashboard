@@ -1222,10 +1222,10 @@ async function selectStock(ticker) {
 
   const breakdownRows = [
     { source:'Catalyst (Earnings)', pts:s.scores.catalyst, max:30, color:'var(--warn)',   detail: hasRealCatalyst ? `${catalystDays}d to earnings` : 'No upcoming earnings' },
-    { source:'Analyst Consensus',   pts:s.scores.analyst,  max:20, color:'var(--accent)', detail: s.scores.analyst>=16?'Strong BUY':s.scores.analyst>=12?'BUY':'HOLD' },
+    { source:'Analyst Consensus',   pts:s.scores.analyst,  max:20, color:'var(--accent)', detail: analystData ? analystDetail : '⚠️ No analyst data' },
     { source:'News Sentiment',      pts:s.scores.news,     max:20, color:'#c084fc',       detail: newsScore>=15?'Positive':newsScore>=10?'Mixed':'Negative' },
     { source:'Price Volatility',    pts:s.scores.volume,   max:15, color:'#4da6ff',       detail: `${Math.abs(s.change).toFixed(2)}% range today` },
-    { source:'Social Buzz', pts:s.scores.social, max:15, color:'#f472b6', detail: socialData ? socialDetail : '⚠️ No data' },
+    { source:'Social Buzz',         pts:s.scores.social,   max:15, color:'#f472b6',       detail: socialData ? socialDetail : '⚠️ No social data' },
   ];
 
   // ── RENDER DETAIL PANEL ────────────────────────────────────────────────────
@@ -1326,6 +1326,7 @@ async function fetchSocialSentiment(symbol) {
   try {
     const res = await fetch(`https://api.stocktwits.com/api/2/streams/symbol/${symbol}.json`);
     const data = await res.json();
+    console.log('StockTwits data:', data.symbol, 'messages:', data.messages?.length);
     if(!data.messages || data.messages.length === 0) return null;
 
     // Count sentiment from recent messages
