@@ -33,7 +33,7 @@ export async function onRequest(context) {
   } else if(type === 'overview') {
     finnhubUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${alphaKey}`;
   } else if(type === 'social') {
-    finnhubUrl = `https://api.stocktwits.com/api/2/streams/symbol/${symbol}.json`;
+    finnhubUrl = `https://finnhub.io/api/v1/stock/social-sentiment?symbol=${symbol}&from=${newsFrom}&to=${fmt(today)}&token=${finnhubKey}`;
   }
 
   try {
