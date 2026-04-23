@@ -1105,10 +1105,11 @@ async function selectStock(ticker) {
     </div>`;
 
   // Fetch all real data in parallel
-  const [profileData, earningsData, newsData] = await Promise.all([
+  const [profileData, earningsData, newsData, analystData] = await Promise.all([
     fetchProfile(ticker),
     fetchEarnings(ticker),
-    fetchRealNews(ticker)
+    fetchRealNews(ticker),
+    fetchAnalyst(ticker)
   ]);
 
   // Only update if user still looking at same stock
@@ -1165,10 +1166,23 @@ async function selectStock(ticker) {
     : 8
     : 5;
 
-  // ── UPDATE SCORES WITH REAL DATA ───────────────────────────────────────────
+  // ── REAL ANALYST SCORE ─────────────────────────────────────────────────────
+  let analystScore = 10; // default if no data
+  let analystDetail = 'No analyst data';
+  if(analystData) {
+    analystScore = analystData.bullishPct >= 75 ? 19
+                 : analystData.bullishPct >= 60 ? 16
+                 : analystData.bullishPct >= 50 ? 13
+                 : analystData.bullishPct >= 40 ? 9
+                 : 5;
+    analystDetail = `${analystData.bullishPct}% bullish — ${analystData.total} analysts`;
+  }
+
+  // ── UPDATE SCORES WITH REAL DATA ──────────────────────────────────────────
   s.scores.catalyst = catalystScore;
   s.scores.news = newsScore;
   s.scores.volume = volumeScore;
+  s.scores.analyst = analystScore;
 
   // ── RECALCULATE WINDOW ─────────────────────────────────────────────────────
   const score = totalScore(s);
@@ -1295,6 +1309,35 @@ async function fetchProfile(symbol) {
 }
 
 // ── FETCH EARNINGS ────────────────────────────────────────────────────────────
+async function fetchAnalyst(symbol) {
+  try {
+    const res = await fetch(`/finnhub?type=analyst&symbol=${symbol}`);
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0) return null;
+    // Use most recent month
+    const latest = data[0];
+    const total = latest.strongBuy + latest.buy + latest.hold + latest.sell + latest.strongSell;
+    if(total === 0) return null;
+    const bullish = latest.strongBuy + latest.buy;
+    const bearish = latest.sell + latest.strongSell;
+    const bullishPct = Math.round((bullish / total) * 100);
+    return {
+      strongBuy: latest.strongBuy,
+      buy: latest.buy,
+      hold: latest.hold,
+      sell: latest.sell,
+      strongSell: latest.strongSell,
+      total,
+      bullishPct,
+      label: bullishPct >= 70 ? 'Strong Buy' 
+           : bullishPct >= 50 ? 'Buy' 
+           : bullishPct >= 40 ? 'Hold' 
+           : 'Sell'
+    };
+  } catch(err) {
+    return null;
+  }
+}
 async function fetchEarnings(symbol) {
   try {
     const res = await fetch(`/finnhub?symbol=${symbol}&type=earnings`);
@@ -1633,7 +1676,7 @@ function selectSearchStock(s) {
 
   const breakdownRows = [
     { source:'Catalyst Signal', pts:s.scores.catalyst, max:30, color:'var(--warn)', detail:'Manual check needed' },
-    { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: s.scores.analyst>=16?'Strong':'Moderate' },
+    { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: analystData ? analystDetail : '⚠️ No data' },
     { source:'News Sentiment', pts:s.scores.news, max:20, color:'#c084fc', detail: s.scores.news>=15?'Positive':'Mixed' },
     { source:'Volume Activity', pts:s.scores.volume, max:15, color:'#4da6ff', detail: s.scores.volume>=12?'Above average':'Normal' },
     { source:'Social Buzz', pts:s.scores.social, max:15, color:'#f472b6', detail: s.scores.social>=12?'Rising':'Low' },
