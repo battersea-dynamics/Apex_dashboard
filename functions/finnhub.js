@@ -30,11 +30,11 @@ export async function onRequest(context) {
     finnhubUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubKey}`;
   } else if(type === 'analyst') {
     finnhubUrl = `https://finnhub.io/api/v1/stock/recommendation?symbol=${symbol}&token=${finnhubKey}`;
-  } } else if(type === 'overview') {
+  } else if(type === 'overview') {
     finnhubUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${alphaKey}`;
-    } else if(type === 'social') {
+  } else if(type === 'social') {
     finnhubUrl = `https://api.stocktwits.com/api/2/streams/symbol/${symbol}.json`;
-    }
+  }
 
   try {
     const response = await fetch(finnhubUrl);
