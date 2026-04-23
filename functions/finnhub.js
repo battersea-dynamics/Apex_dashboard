@@ -29,9 +29,10 @@ export async function onRequest(context) {
   } else if(type === 'profile') {
     finnhubUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubKey}`;
   } else if(type === 'analyst') {
-    useAlpha = true;
+    finnhubUrl = `https://finnhub.io/api/v1/stock/recommendation?symbol=${symbol}&token=${finnhubKey}`;
+  } else if(type === 'overview') {
     finnhubUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${alphaKey}`;
-  }
+   }
 
   try {
     const response = await fetch(finnhubUrl);
