@@ -1691,7 +1691,7 @@ function selectSearchStock(s) {
 
   const breakdownRows = [
     { source:'Catalyst Signal', pts:s.scores.catalyst, max:30, color:'var(--warn)', detail:'Manual check needed' },
-    { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: analystData ? analystDetail : '⚠️ No data' },
+    { source:'Analyst Consensus', pts:s.scores.analyst, max:20, color:'var(--accent)', detail: s.scores.analyst>=16?'Strong BUY':s.scores.analyst>=12?'BUY':'HOLD' },
     { source:'News Sentiment', pts:s.scores.news, max:20, color:'#c084fc', detail: s.scores.news>=15?'Positive':'Mixed' },
     { source:'Volume Activity', pts:s.scores.volume, max:15, color:'#4da6ff', detail: s.scores.volume>=12?'Above average':'Normal' },
     { source:'Social Buzz', pts:0, max:15, color:'#f472b6', detail: '⏳ Reddit integration coming soon' },
