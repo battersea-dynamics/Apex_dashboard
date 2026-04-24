@@ -1066,9 +1066,9 @@ async function scanReddit() {
     if(stocks.status === 'fulfilled') posts.push(...(stocks.value?.data?.children||[]));
 
     // Extract tickers from post titles
-    const tickerRegex = /\$([A-Z]{1,5})\b/g;
-    console.log('Reddit posts found:', posts.length);
-    posts.slice(0,3).forEach(p => console.log('Post title:', p?.data?.title));
+    // Match both $TICKER and plain TICKER formats
+    const dollarRegex = /\$([A-Z]{1,5})\b/g;
+    const plainRegex = /\b(INTC|AAPL|MSFT|NVDA|TSLA|META|AMZN|GOOGL|AMD|PLTR|MRNA|GME|AMC|SPY|QQQ|COIN|HOOD|SOFI|RIVN|NIO|ARM|SMCI|TXN|CRM|ADBE|ORCL|JPM|BAC|GS|MS|TMO|ENPH|FSLR|UBER|SHOP|PYPL|AFRM|NFLX|DIS|SNAP|RBLX|SPOT|LLY|PFE|ABBV|REGN|VRTX|CRSP|BEAM|RXRX)\b/g;
     const mentions = new Map();
 
     posts.forEach(post => {
@@ -1076,13 +1076,16 @@ async function scanReddit() {
       const text = post?.data?.selftext || '';
       const content = title + ' ' + text;
       let match;
-      while((match = tickerRegex.exec(content)) !== null) {
-        const ticker = match[1];
-        if(ticker.length >= 2 && ticker.length <= 5) {
-          mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
-        }
-      }
-    });
+  // Catch $TICKER format
+  while((match = dollarRegex.exec(content)) !== null) {
+   const ticker = match[1];
+   mentions.set(ticker, (mentions.get(ticker) || 0) + 2); // weight higher
+}
+// Catch plain TICKER format
+while((match = plainRegex.exec(content)) !== null) {
+  const ticker = match[1];
+  mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
+}
 
     // Only keep tickers mentioned 2+ times
     mentions.forEach((count, ticker) => {
