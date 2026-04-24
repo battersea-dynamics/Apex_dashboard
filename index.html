@@ -1326,6 +1326,33 @@ async function fetchSocialSentiment(symbol) {
   // Social sentiment pending Reddit integration
   return null;
 }
+async function fetchAnalyst(symbol) {
+  try {
+    const res = await fetch(`/finnhub?type=analyst&symbol=${symbol}`);
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0) return null;
+    const latest = data[0];
+    const total = latest.strongBuy + latest.buy + latest.hold + latest.sell + latest.strongSell;
+    if(total === 0) return null;
+    const bullish = latest.strongBuy + latest.buy;
+    const bullishPct = Math.round((bullish / total) * 100);
+    return {
+      strongBuy: latest.strongBuy,
+      buy: latest.buy,
+      hold: latest.hold,
+      sell: latest.sell,
+      strongSell: latest.strongSell,
+      total,
+      bullishPct,
+      label: bullishPct >= 70 ? 'Strong Buy'
+           : bullishPct >= 50 ? 'Buy'
+           : bullishPct >= 40 ? 'Hold'
+           : 'Sell'
+    };
+  } catch(err) {
+    return null;
+  }
+}
 async function fetchEarnings(symbol) {
   try {
     const res = await fetch(`/finnhub?symbol=${symbol}&type=earnings`);
