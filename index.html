@@ -1057,8 +1057,8 @@ async function scanReddit() {
   try {
     // Fetch trending from r/wallstreetbets and r/stocks
     const [wsb, stocks] = await Promise.allSettled([
-      fetch('https://www.reddit.com/r/wallstreetbets/hot.json?limit=25').then(r=>r.json()),
-      fetch('https://www.reddit.com/r/stocks/hot.json?limit=25').then(r=>r.json())
+      fetch('/finnhub?type=reddit-wsb').then(r=>r.json()),
+      fetch('/finnhub?type=reddit-stocks').then(r=>r.json())
     ]);
 
     const posts = [];

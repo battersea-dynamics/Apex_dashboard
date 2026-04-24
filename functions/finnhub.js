@@ -34,6 +34,10 @@ export async function onRequest(context) {
     finnhubUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${alphaKey}`;
   } else if(type === 'social') {
     finnhubUrl = `https://finnhub.io/api/v1/stock/social-sentiment?symbol=${symbol}&from=${newsFrom}&to=${fmt(today)}&token=${finnhubKey}`;
+  } else if(type === 'reddit-wsb') {
+    finnhubUrl = `https://www.reddit.com/r/wallstreetbets/hot.json?limit=25`;
+  } else if(type === 'reddit-stocks') {
+    finnhubUrl = `https://www.reddit.com/r/stocks/hot.json?limit=25`;
   }
 
   try {
