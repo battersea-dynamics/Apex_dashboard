@@ -1067,6 +1067,8 @@ async function scanReddit() {
 
     // Extract tickers from post titles
     const tickerRegex = /\$([A-Z]{1,5})\b/g;
+    console.log('Reddit posts found:', posts.length);
+    posts.slice(0,3).forEach(p => console.log('Post title:', p?.data?.title));
     const mentions = new Map();
 
     posts.forEach(post => {
