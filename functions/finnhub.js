@@ -41,7 +41,12 @@ export async function onRequest(context) {
   }
 
   try {
-    const response = await fetch(finnhubUrl);
+    const isReddit = finnhubUrl.includes('reddit.com');
+    const response = await fetch(finnhubUrl, isReddit ? {
+    headers: {
+    'User-Agent': 'APEX:StockDashboard:1.0 (personal project)'
+  }
+} : {});
     const data = await response.text();
     return new Response(data, {
       headers: {
