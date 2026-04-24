@@ -1085,7 +1085,7 @@ async function scanReddit() {
 while((match = plainRegex.exec(content)) !== null) {
   const ticker = match[1];
   mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
-}
+}});
 
     // Only keep tickers mentioned 2+ times
     mentions.forEach((count, ticker) => {
