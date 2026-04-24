@@ -1225,7 +1225,7 @@ async function selectStock(ticker) {
     { source:'Analyst Consensus',   pts:s.scores.analyst,  max:20, color:'var(--accent)', detail: analystData ? analystDetail : '⚠️ No analyst data' },
     { source:'News Sentiment',      pts:s.scores.news,     max:20, color:'#c084fc',       detail: newsScore>=15?'Positive':newsScore>=10?'Mixed':'Negative' },
     { source:'Price Volatility',    pts:s.scores.volume,   max:15, color:'#4da6ff',       detail: `${Math.abs(s.change).toFixed(2)}% range today` },
-    { source:'Social Buzz',         pts:s.scores.social,   max:15, color:'#f472b6',       detail: socialData ? socialDetail : '⚠️ No social data' },
+    { source:'Social Buzz',         pts:0,                 max:15, color:'#f472b6',       detail: '⏳ Reddit integration coming soon' },
   ];
 
   // ── RENDER DETAIL PANEL ────────────────────────────────────────────────────
