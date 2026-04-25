@@ -1456,26 +1456,109 @@ Give a 2-3 sentence analysis in plain English that a beginner investor can under
 
 // ── MY STOCKS ──────────────────────────────────────────────────────────────────
 function addToMyStocks(ticker, name, price) {
-  if(myStocks.find(s => s.ticker === ticker)) return;
+  if(myStocks.find(s => s.ticker === ticker)) {
+    alert(`${ticker} is already in My Stocks`);
+    return;
+  }
 
-  // Simple add with defaults — user can set thresholds later
+  // Show input form in detail panel
+  const formHtml = `
+    <div style="padding:16px 20px;background:rgba(0,255,208,0.04);border:1px solid rgba(0,255,208,0.15);border-radius:12px;margin:16px 20px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:14px">
+        ADD ${ticker} TO MY STOCKS
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">BUY PRICE ($)</div>
+          <input id="form-buyprice" type="number" step="0.01" value="${price.toFixed(2)}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SHARES</div>
+          <input id="form-shares" type="number" step="1" min="1" value="1"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TAKE PROFIT (%)</div>
+          <input id="form-takeprofit" type="number" step="1" value="20"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--up);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">STOP LOSS (%)</div>
+          <input id="form-stoploss" type="number" step="1" value="10"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button onclick="confirmAddToMyStocks('${ticker}','${name}',${price})"
+          style="flex:1;padding:10px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">
+          CONFIRM ADD
+        </button>
+        <button onclick="selectStock('${ticker}','watch')"
+          style="padding:10px 14px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">
+          CANCEL
+        </button>
+      </div>
+    </div>`;
+
+  // Insert form after action buttons in detail panel
+  const actionDiv = document.querySelector('.detail-panel [style*="display:flex;gap:8px;padding:12px"]');
+  if(actionDiv) {
+    // Remove existing form if any
+    const existing = document.getElementById('addStockForm');
+    if(existing) existing.remove();
+    
+    const formEl = document.createElement('div');
+    formEl.id = 'addStockForm';
+    formEl.innerHTML = formHtml;
+    actionDiv.after(formEl);
+    
+    // Scroll to form
+    formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function confirmAddToMyStocks(ticker, name, currentPrice) {
+  const buyPrice = parseFloat(document.getElementById('form-buyprice')?.value) || currentPrice;
+  const shares = parseFloat(document.getElementById('form-shares')?.value) || 1;
+  const takeProfit = parseFloat(document.getElementById('form-takeprofit')?.value) || 20;
+  const stopLoss = parseFloat(document.getElementById('form-stoploss')?.value) || 10;
+
   myStocks.push({
     ticker,
     name,
-    buyPrice: price,
-    currentPrice: price,
-    shares: 1,
-    takeProfit: 20,  // default 20%
-    stopLoss: 10,    // default 10%
+    buyPrice,
+    currentPrice,
+    shares,
+    takeProfit,
+    stopLoss,
     addedAt: new Date().toISOString()
   });
 
   localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
   updateCounts();
 
-  // Show confirmation
+  // Remove form and refresh detail
+  const form = document.getElementById('addStockForm');
+  if(form) form.remove();
+
+  // Update button
   const btn = document.querySelector(`button[onclick*="addToMyStocks"]`);
-  if(btn) btn.textContent = '✅ Added to My Stocks';
+  if(btn) {
+    btn.textContent = '✅ In My Stocks';
+    btn.style.background = 'rgba(0,255,208,0.04)';
+    btn.style.borderColor = 'rgba(0,255,208,0.1)';
+    btn.style.color = 'var(--accent)';
+    btn.onclick = null;
+  }
+
+  // Switch to My Stocks tab to show it
+  switchTab('mystocks');
 }
 
 function addToWatchlist(ticker, name, price) {
