@@ -1057,14 +1057,18 @@ async function scanReddit() {
 
   try {
     // Fetch trending from r/wallstreetbets and r/stocks
-    const [wsb, stocks] = await Promise.allSettled([
+    const [wsb, stocks, investing, biotech] = await Promise.allSettled([
       fetch('/finnhub?type=reddit-wsb').then(r=>r.json()),
-      fetch('/finnhub?type=reddit-stocks').then(r=>r.json())
+      fetch('/finnhub?type=reddit-stocks').then(r=>r.json()),
+      fetch('/finnhub?type=reddit-investing').then(r=>r.json()),
+      fetch('/finnhub?type=reddit-biotech').then(r=>r.json())
     ]);
 
     const posts = [];
     if(wsb.status === 'fulfilled') posts.push(...(wsb.value?.data?.children||[]));
     if(stocks.status === 'fulfilled') posts.push(...(stocks.value?.data?.children||[]));
+    if(investing.status === 'fulfilled') posts.push(...(investing.value?.data?.children||[]));
+    if(biotech.status === 'fulfilled') posts.push(...(biotech.value?.data?.children||[]));
 
     // Extract tickers from post titles
     const dollarRegex = /\$([A-Z]{1,5})\b/g;

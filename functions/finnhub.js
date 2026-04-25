@@ -38,6 +38,12 @@ export async function onRequest(context) {
     finnhubUrl = `https://www.reddit.com/r/wallstreetbets/hot.json?limit=25`;
   } else if(type === 'reddit-stocks') {
     finnhubUrl = `https://www.reddit.com/r/stocks/hot.json?limit=25`;
+  } else if(type === 'reddit-stocks') {
+    finnhubUrl = `https://www.reddit.com/r/stocks/hot.json?limit=25`;
+  } else if(type === 'reddit-investing') {
+    finnhubUrl = `https://www.reddit.com/r/investing/hot.json?limit=25`;
+  } else if(type === 'reddit-biotech') {
+    finnhubUrl = `https://www.reddit.com/r/biotech/hot.json?limit=25`;
   }
 
   try {
