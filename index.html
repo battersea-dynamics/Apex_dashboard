@@ -1583,6 +1583,19 @@ function editMyStock(ticker) {
         </button>
       </div>
     </div>`;
+
+  // Insert form into stock list below the card
+  const card = document.getElementById('card-' + ticker);
+  if(card) {
+    const existing = document.getElementById('editForm-' + ticker);
+    if(existing) { existing.remove(); return; }
+
+    const formEl = document.createElement('div');
+    formEl.id = 'editForm-' + ticker;
+    formEl.innerHTML = formHtml;
+    card.after(formEl);
+    formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 function confirmEditMyStock(ticker) {
