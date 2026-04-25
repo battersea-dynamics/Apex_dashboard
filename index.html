@@ -19,7 +19,6 @@
   --danger:  #ff3355;
   --text:    #e2eaf5;
   --text2:   #6b7f99;
-  /*--text3:   #2e3f55;*/
   --text3:   #e2eaf5;
   --up:      #00ffd0;
   --down:    #ff3355;
@@ -29,9 +28,7 @@
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
 html { font-size: 16px; }
-
 body {
   background: var(--bg);
   color: var(--text);
@@ -41,8 +38,6 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
-
-/* Background texture */
 body::before {
   content:'';
   position:fixed;
@@ -54,8 +49,6 @@ body::before {
   pointer-events:none;
   z-index:0;
 }
-
-/* ── LAYOUT ────────────────────────────────── */
 .app {
   position: relative;
   z-index: 1;
@@ -66,7 +59,7 @@ body::before {
   overflow: hidden;
 }
 
-/* ── TOPBAR ────────────────────────────────── */
+/* TOPBAR */
 .topbar {
   display: flex;
   align-items: center;
@@ -77,7 +70,6 @@ body::before {
   flex-shrink: 0;
   z-index: 10;
 }
-
 .logo {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 28px;
@@ -86,14 +78,7 @@ body::before {
   text-shadow: 0 0 20px rgba(0,255,208,0.4);
   flex-shrink: 0;
 }
-
-/* Search */
-.search-wrap {
-  flex: 1;
-  position: relative;
-  max-width: 400px;
-}
-
+.search-wrap { flex: 1; position: relative; max-width: 400px; }
 .search-input {
   width: 100%;
   background: var(--bg3);
@@ -106,15 +91,12 @@ body::before {
   outline: none;
   transition: all 0.2s;
 }
-
 .search-input::placeholder { color: var(--text3); }
 .search-input:focus { border-color: rgba(0,255,208,0.3); background: var(--bg4); }
-
 .search-results {
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   background: var(--bg3);
   border: 1px solid var(--border2);
   border-radius: var(--radius);
@@ -125,535 +107,260 @@ body::before {
   max-height: 300px;
   overflow-y: auto;
 }
-
 .search-results.open { display: block; }
-
 .search-result-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; cursor: pointer;
   border-bottom: 1px solid var(--border);
   transition: background 0.1s;
 }
-
 .search-result-item:last-child { border-bottom: none; }
 .search-result-item:hover, .search-result-item:active { background: rgba(0,255,208,0.05); }
-
 .sri-ticker { font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:var(--accent); min-width:50px; }
 .sri-name { font-size:12px; color:var(--text2); flex:1; }
 .search-loading { padding:12px 14px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--accent); }
 .search-no-result { padding:12px 14px; font-size:11px; color:var(--text3); }
-
-/* Scan button */
 .scan-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  display: flex; align-items: center; gap: 6px;
   padding: 8px 14px;
-  background: var(--accent);
-  color: var(--bg);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s;
-  white-space: nowrap;
+  background: var(--accent); color: var(--bg);
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px;
+  cursor: pointer; flex-shrink: 0; transition: all 0.2s; white-space: nowrap;
 }
-
 .scan-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 .scan-btn:active { transform: translateY(0); }
 .scan-btn.scanning { background: var(--bg3); color: var(--accent); border: 1px solid var(--accent); }
 
-/* ── TABS ──────────────────────────────────── */
+/* TABS */
 .tabs {
-  display: flex;
-  background: var(--bg2);
+  display: flex; background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  flex-shrink: 0; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
-
 .tabs::-webkit-scrollbar { display: none; }
-
 .tab {
-  flex: 1;
-  min-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--text3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s;
-  white-space: nowrap;
-  text-transform: uppercase;
+  flex: 1; min-width: 100px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+  color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.15s; white-space: nowrap; text-transform: uppercase;
 }
-
 .tab:hover { color: var(--text2); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-count {
-  background: var(--bg3);
-  color: var(--text2);
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 10px;
+  background: var(--bg3); color: var(--text2);
+  font-size: 10px; padding: 1px 6px; border-radius: 10px;
   font-family: 'IBM Plex Mono', monospace;
 }
 .tab.active .tab-count { background: rgba(0,255,208,0.15); color: var(--accent); }
 
-/* ── MAIN CONTENT ──────────────────────────── */
-.main-content {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  position: relative;
+/* Alert dot on tab badge */
+.tab-alert-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--warn); box-shadow: 0 0 6px var(--warn);
+  flex-shrink: 0; animation: pulse 1.5s infinite;
 }
 
-/* Desktop: side by side */
+/* LAYOUT */
+.main-content { flex: 1; overflow: hidden; display: flex; position: relative; }
 @media (min-width: 768px) {
   .main-content { flex-direction: row; }
   .stock-list { border-right: 1px solid var(--border); width: 380px; flex-shrink: 0; }
   .detail-panel { flex: 1; }
 }
-
-/* Mobile: stacked */
 @media (max-width: 767px) {
   .main-content { flex-direction: column; }
   .stock-list { flex: 1; overflow-y: auto; }
   .detail-panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 70vh;
-    background: var(--bg2);
-    border-top: 1px solid var(--border2);
+    position: fixed; bottom: 0; left: 0; right: 0; height: 70vh;
+    background: var(--bg2); border-top: 1px solid var(--border2);
     border-radius: 20px 20px 0 0;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    z-index: 50;
-    overflow-y: auto;
+    z-index: 50; overflow-y: auto;
   }
   .detail-panel.open { transform: translateY(0); }
   .detail-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 49;
-    display: none;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 49; display: none;
   }
   .detail-overlay.open { display: block; }
 }
 
-/* ── STOCK LIST ────────────────────────────── */
+/* STOCK LIST */
 .stock-list {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
-
 .stock-list::-webkit-scrollbar { width: 3px; }
 .stock-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* Empty state */
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 300px;
-  gap: 12px;
-  padding: 40px 20px;
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; min-height: 300px; gap: 12px; padding: 40px 20px; text-align: center;
 }
-
 .empty-icon { font-size: 48px; opacity: 0.4; }
 .empty-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--text2); }
 .empty-desc { font-size: 13px; color: var(--text3); line-height: 1.6; max-width: 260px; }
 
-/* Loading state */
 .loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  gap: 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 200px; gap: 16px;
 }
-
 .spinner {
   width: 32px; height: 32px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
 }
-
 .loading-text {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  animation: pulse 1.5s infinite;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  color: var(--accent); letter-spacing: 2px; animation: pulse 1.5s infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
 
-/* ── STOCK CARD ────────────────────────────── */
-.stock-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.15s;
-  animation: fadeUp 0.3s ease both;
-  position: relative;
+/* ── ALERT BANNERS ─────────────────────────── */
+.alerts-container { flex-shrink: 0; }
+
+.alert-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  animation: slideDown 0.25s ease both;
+  border-left: 3px solid transparent;
 }
+.alert-banner.alert-profit {
+  background: rgba(0,255,208,0.05);
+  border-left-color: var(--up);
+}
+.alert-banner.alert-loss {
+  background: rgba(255,51,85,0.05);
+  border-left-color: var(--down);
+}
+.alert-banner.alert-earnings {
+  background: rgba(255,184,0,0.05);
+  border-left-color: var(--warn);
+}
+.alert-body { flex: 1; min-width: 0; }
+.alert-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  font-weight: 700; letter-spacing: 0.5px; margin-bottom: 3px;
+}
+.alert-banner.alert-profit .alert-title { color: var(--up); }
+.alert-banner.alert-loss .alert-title { color: var(--down); }
+.alert-banner.alert-earnings .alert-title { color: var(--warn); }
+.alert-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
+.alert-dismiss {
+  background: none; border: none; color: var(--text2);
+  font-size: 16px; cursor: pointer; padding: 0 2px; flex-shrink: 0;
+  opacity: 0.4; transition: opacity 0.15s; line-height: 1; margin-top: 1px;
+}
+.alert-dismiss:hover { opacity: 1; }
 
+/* STOCK CARD */
+.stock-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s;
+  animation: fadeUp 0.3s ease both; position: relative;
+}
 .stock-card:active, .stock-card:hover { background: rgba(255,255,255,0.02); }
 .stock-card.selected { background: rgba(0,255,208,0.04); border-left: 2px solid var(--accent); padding-left: 14px; }
-
-/* Hot badge on left */
-.card-heat {
-  width: 4px;
-  border-radius: 2px;
-  align-self: stretch;
-  flex-shrink: 0;
-}
-
+.card-heat { width: 4px; border-radius: 2px; align-self: stretch; flex-shrink: 0; }
 .card-heat.both { background: var(--accent); box-shadow: 0 0 8px rgba(0,255,208,0.4); }
 .card-heat.finnhub { background: var(--accent2); }
 .card-heat.reddit { background: #ff6b35; }
 .card-heat.watch { background: var(--warn); }
 .card-heat.owned { background: var(--accent); }
-
 .card-main { flex: 1; min-width: 0; }
-
-.card-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 3px;
-}
-
-.card-ticker {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
-  letter-spacing: 1px;
-  line-height: 1;
-}
-
-.card-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 3px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
+.card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.card-ticker { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; line-height: 1; }
+.card-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.5px; text-transform: uppercase; }
 .badge-both { background: rgba(0,255,208,0.1); color: var(--accent); border: 1px solid rgba(0,255,208,0.2); }
 .badge-finnhub { background: rgba(0,102,255,0.1); color: #4d94ff; border: 1px solid rgba(0,102,255,0.2); }
 .badge-reddit { background: rgba(255,107,53,0.1); color: #ff6b35; border: 1px solid rgba(255,107,53,0.2); }
 .badge-watch { background: rgba(255,184,0,0.1); color: var(--warn); border: 1px solid rgba(255,184,0,0.2); }
 .badge-owned { background: rgba(0,255,208,0.1); color: var(--accent); border: 1px solid rgba(0,255,208,0.2); }
-
 .card-name { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-reason { font-size: 11px; color: var(--text3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
 .card-right { text-align: right; flex-shrink: 0; }
 .card-price { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }
 .card-change {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 2px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700;
+  display: inline-block; padding: 2px 6px; border-radius: 4px; margin-top: 2px;
 }
 .card-change.up { background: rgba(0,255,208,0.1); color: var(--up); }
 .card-change.dn { background: rgba(255,51,85,0.1); color: var(--down); }
-
-/* P&L for owned stocks */
-.card-pnl {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  margin-top: 2px;
-}
+.card-pnl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; margin-top: 2px; }
 .card-pnl.up { color: var(--up); }
 .card-pnl.dn { color: var(--down); }
 
-/* ── DETAIL PANEL ───────────────────────────── */
-.detail-panel {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background: var(--bg2);
-}
-
-/* Mobile drag handle */
-.drag-handle {
-  display: none;
-  width: 40px;
-  height: 4px;
-  background: var(--border2);
-  border-radius: 2px;
-  margin: 12px auto 8px;
-}
-
+/* DETAIL PANEL */
+.detail-panel { overflow-y: auto; -webkit-overflow-scrolling: touch; background: var(--bg2); }
+.drag-handle { display: none; width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 12px auto 8px; }
 @media (max-width: 767px) {
   .drag-handle { display: block; }
   .detail-close {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--text2);
+    position: absolute; top: 12px; right: 16px;
+    width: 32px; height: 32px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; color: var(--text2);
   }
 }
-
-@media (min-width: 768px) {
-  .detail-close { display: none; }
-}
-
+@media (min-width: 768px) { .detail-close { display: none; } }
 .detail-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 12px;
-  opacity: 0.3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 12px; opacity: 0.3;
 }
-
-.detail-empty-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 56px;
-  letter-spacing: 6px;
-  color: var(--accent);
-}
-
-.detail-empty-text {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: var(--text2);
-  letter-spacing: 2px;
-}
-
-/* Detail content */
-.detail-header {
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.detail-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
+.detail-empty-logo { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 6px; color: var(--accent); }
+.detail-empty-text { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text2); letter-spacing: 2px; }
+.detail-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.detail-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .detail-left { display: flex; align-items: center; gap: 12px; }
-
-.detail-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  object-fit: contain;
-  background: white;
-  padding: 2px;
-  flex-shrink: 0;
-}
-
-.detail-ticker-block {}
-.detail-ticker {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 32px;
-  letter-spacing: 2px;
-  line-height: 1;
-}
+.detail-logo { width: 36px; height: 36px; border-radius: 8px; object-fit: contain; background: white; padding: 2px; flex-shrink: 0; }
+.detail-ticker { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; line-height: 1; }
 .detail-name { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
 .detail-price-block { text-align: right; }
 .detail-price { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700; }
-.detail-change-badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 5px;
-  display: inline-block;
-  margin-top: 3px;
-}
-
-.detail-meta {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.meta-pill {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
-  color: var(--text3);
-  background: var(--bg3);
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-}
-
-/* AI Advice box */
-.ai-advice-box {
-  margin: 16px 20px;
-  background: rgba(0,255,208,0.04);
-  border: 1px solid rgba(0,255,208,0.15);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-}
-
-.ai-advice-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.ai-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.ai-verdict {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 2px;
-  padding: 3px 10px;
-  border-radius: 4px;
-}
-
+.detail-change-badge { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 5px; display: inline-block; margin-top: 3px; }
+.detail-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.meta-pill { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text3); background: var(--bg3); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); }
+.ai-advice-box { margin: 16px 20px; background: rgba(0,255,208,0.04); border: 1px solid rgba(0,255,208,0.15); border-radius: var(--radius); padding: 14px 16px; }
+.ai-advice-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ai-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+.ai-verdict { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; padding: 3px 10px; border-radius: 4px; }
 .verdict-buy { background: rgba(0,255,208,0.15); color: var(--up); }
 .verdict-monitor { background: rgba(255,184,0,0.15); color: var(--warn); }
 .verdict-avoid { background: rgba(255,51,85,0.15); color: var(--down); }
 .verdict-sell { background: rgba(255,51,85,0.2); color: var(--down); }
-
 .ai-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
-
-.ai-get-btn {
-  width: 100%;
-  padding: 10px;
-  background: transparent;
-  border: 1px solid rgba(0,255,208,0.2);
-  border-radius: var(--radius-sm);
-  color: var(--accent);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 1px;
-}
-
+.ai-get-btn { width: 100%; padding: 10px; background: transparent; border: 1px solid rgba(0,255,208,0.2); border-radius: var(--radius-sm); color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
 .ai-get-btn:hover, .ai-get-btn:active { background: rgba(0,255,208,0.08); }
-
-/* Score section */
-.score-section {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.section-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
-  color: var(--text3);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.score-total {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 32px;
-  letter-spacing: 2px;
-}
-
-.score-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-
+.score-section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.section-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.score-total { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; }
+.score-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
 .score-row:last-child { border-bottom: none; }
 .score-source { font-size: 11px; color: var(--text2); flex: 1; }
 .score-detail { font-size: 10px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; }
 .score-track { width: 60px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
 .score-fill { height: 100%; border-radius: 2px; }
 .score-pts { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; width: 32px; text-align: right; flex-shrink: 0; }
-
-/* Catalyst section */
-.catalyst-section {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255,184,0,0.03);
-}
-
-.catalyst-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
+.catalyst-section { padding: 14px 20px; border-bottom: 1px solid var(--border); background: rgba(255,184,0,0.03); }
+.catalyst-row { display: flex; align-items: center; gap: 10px; }
 .catalyst-icon { font-size: 20px; }
-.catalyst-info {}
 .catalyst-date { font-size: 13px; font-weight: 600; color: var(--warn); }
 .catalyst-urgency { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
-/* News section */
 .news-section { padding: 14px 20px; }
-
-.news-item {
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  cursor: pointer;
-}
-
+.news-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; }
 .news-item:last-child { border-bottom: none; }
 .news-item:active { opacity: 0.7; }
-
 .news-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .news-time { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text3); }
 .news-sent { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }
@@ -661,86 +368,15 @@ body::before {
 .news-sent.neg { background: rgba(255,51,85,0.1); color: var(--down); }
 .news-sent.neu { background: rgba(107,127,153,0.1); color: var(--text2); }
 .news-headline { font-size: 12px; line-height: 1.5; color: var(--text); }
-
-/* ── MY STOCKS — Add form ───────────────────── */
-.add-stock-bar {
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-
-.add-input {
-  flex: 1;
-  min-width: 80px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  color: var(--text);
-  outline: none;
-}
-
-.add-input::placeholder { color: var(--text3); font-size: 11px; }
-.add-input:focus { border-color: rgba(0,255,208,0.3); }
-
-.add-btn {
-  padding: 8px 14px;
-  background: var(--accent);
-  color: var(--bg);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-/* P&L summary bar */
-.pnl-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.pnl-cell {
-  background: var(--bg2);
-  padding: 10px 16px;
-  text-align: center;
-}
-
+.pnl-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.pnl-cell { background: var(--bg2); padding: 10px 16px; text-align: center; }
 .pnl-label { font-size: 9px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
 .pnl-value { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }
-
-/* ── DISCOVERY SCAN RESULTS ─────────────────── */
-.scan-summary {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  font-size: 11px;
-  color: var(--text3);
-  font-family: 'IBM Plex Mono', monospace;
-  flex-shrink: 0;
-}
-
+.scan-summary { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--bg2); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
 .scan-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: pulse 2s infinite; flex-shrink: 0; }
-
 .legend { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
 .legend-item { display: flex; align-items: center; gap: 4px; font-size: 9px; }
 .legend-dot { width: 6px; height: 6px; border-radius: 50%; }
-
-/* ── SCROLLBAR ──────────────────────────────── */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -749,12 +385,11 @@ body::before {
 <body>
 <div class="app">
 
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="logo">APEX</div>
     <div class="search-wrap">
-      <input type="text" id="searchInput" class="search-input" 
-             placeholder="Search any stock..." 
+      <input type="text" id="searchInput" class="search-input"
+             placeholder="Search any stock..."
              autocomplete="off"
              oninput="onSearchInput(this.value)"
              onkeydown="onSearchKey(event)"/>
@@ -763,7 +398,6 @@ body::before {
     <button class="scan-btn" id="scanBtn" onclick="startScan()">🔥 SCAN</button>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
     <div class="tab active" id="tab-discovery" onclick="switchTab('discovery')">
       🔥 Discovery
@@ -779,10 +413,7 @@ body::before {
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main-content">
-
-    <!-- STOCK LIST -->
     <div class="stock-list" id="stockList">
       <div class="empty-state">
         <div class="empty-icon">🔥</div>
@@ -790,8 +421,6 @@ body::before {
         <div class="empty-desc">Press SCAN to discover hot stocks from Finnhub and Reddit, or search for any stock above.</div>
       </div>
     </div>
-
-    <!-- DETAIL PANEL -->
     <div class="detail-panel" id="detailPanel">
       <div class="drag-handle"></div>
       <div class="detail-close" onclick="closeDetail()">✕</div>
@@ -800,10 +429,7 @@ body::before {
         <div class="detail-empty-text">TAP A STOCK TO ANALYSE</div>
       </div>
     </div>
-
-    <!-- Mobile overlay -->
     <div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
-
   </div>
 </div>
 
@@ -814,16 +440,17 @@ let selectedTicker = null;
 let discoveryResults = [];
 let searchTimeout = null;
 
-// Persistent data
 let myStocks = JSON.parse(localStorage.getItem('apexMyStocks') || '[]');
 let watchlist = JSON.parse(localStorage.getItem('apexWatchlist') || '[]');
+
+// Alerts dismissed this session — key = ticker+type so they come back next load
+let dismissedAlerts = new Set();
 
 // ── TABS ───────────────────────────────────────────────────────────────────────
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-
   if(tab === 'discovery') renderDiscovery();
   else if(tab === 'mystocks') renderMyStocks();
   else if(tab === 'watchlist') renderWatchlist();
@@ -841,10 +468,8 @@ function onSearchInput(val) {
   const q = val.trim();
   const el = document.getElementById('searchResults');
   if(q.length < 2) { el.classList.remove('open'); return; }
-
   el.innerHTML = `<div class="search-loading">⬡ Searching...</div>`;
   el.classList.add('open');
-
   searchTimeout = setTimeout(async () => {
     try {
       const res = await fetch(`/finnhub?type=search&query=${encodeURIComponent(q)}`);
@@ -943,32 +568,138 @@ function formatMarketCap(mc) {
 
 function calcScore(quote, earnings, analyst, news) {
   let catalyst = 5, analystScore = 10, newsScore = 8, volatility = 5;
-
   if(earnings) {
     catalyst = earnings.days <= 1 ? 29 : earnings.days <= 3 ? 25 : earnings.days <= 7 ? 20 : earnings.days <= 14 ? 15 : earnings.days <= 30 ? 10 : 5;
   }
-
   if(analyst) {
     analystScore = analyst.bullishPct >= 75 ? 19 : analyst.bullishPct >= 60 ? 16 : analyst.bullishPct >= 50 ? 13 : analyst.bullishPct >= 40 ? 9 : 5;
   }
-
   if(news && news.length > 0) {
     const pos = news.filter(n=>n.s==='pos').length;
     const neg = news.filter(n=>n.s==='neg').length;
     newsScore = pos > neg ? Math.min(20, 12 + pos*2) : Math.max(3, 10 - neg*2);
   }
-
   if(quote) {
     const change = Math.abs(quote.dp||0);
     volatility = change > 5 ? 14 : change > 3 ? 11 : change > 1 ? 8 : 5;
   }
-
   return { catalyst, analyst: analystScore, news: newsScore, volatility, total: catalyst + analystScore + newsScore + volatility };
 }
 
-// ── DISCOVERY SCAN ─────────────────────────────────────────────────────────────
+// ── ALERTS ─────────────────────────────────────────────────────────────────────
 
-// S&P 500 sample universe — easily expandable
+async function checkAlerts() {
+  const alerts = [];
+
+  // Fetch earnings for all owned stocks in parallel
+  const earningsResults = await Promise.allSettled(
+    myStocks.map(s => fetchEarnings(s.ticker).then(e => ({ ticker: s.ticker, earnings: e })))
+  );
+
+  // Price / P&L alerts (prices already updated before this is called)
+  myStocks.forEach(s => {
+    const pnlPct = ((s.currentPrice - s.buyPrice) / s.buyPrice) * 100;
+
+    const tpKey = `${s.ticker}-tp`;
+    if(pnlPct >= s.takeProfit && !dismissedAlerts.has(tpKey)) {
+      alerts.push({
+        key: tpKey,
+        type: 'profit',
+        title: `🎯 ${s.ticker} — Take Profit Hit`,
+        desc: `Up ${pnlPct.toFixed(1)}% from your buy price of $${s.buyPrice.toFixed(2)}. Your target was +${s.takeProfit}%. Consider taking some profit.`
+      });
+    }
+
+    const slKey = `${s.ticker}-sl`;
+    if(pnlPct <= -s.stopLoss && !dismissedAlerts.has(slKey)) {
+      alerts.push({
+        key: slKey,
+        type: 'loss',
+        title: `⚠️ ${s.ticker} — Stop Loss Reached`,
+        desc: `Down ${Math.abs(pnlPct).toFixed(1)}% from your buy price of $${s.buyPrice.toFixed(2)}. Your limit was -${s.stopLoss}%. Review your position.`
+      });
+    }
+  });
+
+  // Earnings alerts
+  earningsResults.forEach(result => {
+    if(result.status !== 'fulfilled') return;
+    const { ticker, earnings } = result.value;
+    if(!earnings) return;
+    const eKey = `${ticker}-earnings`;
+    if(earnings.days >= 0 && earnings.days <= 3 && !dismissedAlerts.has(eKey)) {
+      const urgency = earnings.days === 0 ? 'TODAY' : earnings.days === 1 ? 'TOMORROW' : `in ${earnings.days} days`;
+      alerts.push({
+        key: eKey,
+        type: 'earnings',
+        title: `📊 ${ticker} — Earnings ${urgency}`,
+        desc: `Q${earnings.quarter} ${earnings.year} report due ${earnings.date}. Expect high volatility — review your position size.`
+      });
+    }
+  });
+
+  return alerts;
+}
+
+function renderAlerts(alerts) {
+  if(alerts.length === 0) return '';
+  return `<div class="alerts-container" id="alertsContainer">
+    ${alerts.map(a => `
+      <div class="alert-banner alert-${a.type}" id="alert-${a.key}">
+        <div class="alert-body">
+          <div class="alert-title">${a.title}</div>
+          <div class="alert-desc">${a.desc}</div>
+        </div>
+        <button class="alert-dismiss" onclick="dismissAlert('${a.key}')" title="Dismiss">✕</button>
+      </div>`).join('')}
+  </div>`;
+}
+
+function dismissAlert(key) {
+  dismissedAlerts.add(key);
+  const el = document.getElementById('alert-' + key);
+  if(el) {
+    el.style.transition = 'opacity 0.2s ease, max-height 0.3s ease, padding 0.3s ease';
+    el.style.opacity = '0';
+    el.style.maxHeight = '0';
+    el.style.overflow = 'hidden';
+    el.style.paddingTop = '0';
+    el.style.paddingBottom = '0';
+    setTimeout(() => {
+      el.remove();
+      updateAlertDot();
+    }, 300);
+  }
+}
+
+function updateAlertDot() {
+  const container = document.getElementById('alertsContainer');
+  const hasAlerts = container && container.querySelectorAll('.alert-banner').length > 0;
+  const tab = document.getElementById('tab-mystocks');
+  const existing = tab.querySelector('.tab-alert-dot');
+  if(hasAlerts && !existing) {
+    const dot = document.createElement('div');
+    dot.className = 'tab-alert-dot';
+    tab.insertBefore(dot, tab.firstChild);
+  } else if(!hasAlerts && existing) {
+    existing.remove();
+  }
+}
+
+function showAlertDotIfNeeded(alerts) {
+  const tab = document.getElementById('tab-mystocks');
+  const existing = tab.querySelector('.tab-alert-dot');
+  const active = alerts.filter(a => !dismissedAlerts.has(a.key));
+  if(active.length > 0 && !existing) {
+    const dot = document.createElement('div');
+    dot.className = 'tab-alert-dot';
+    tab.insertBefore(dot, tab.firstChild);
+  } else if(active.length === 0 && existing) {
+    existing.remove();
+  }
+}
+
+// ── DISCOVERY SCAN ─────────────────────────────────────────────────────────────
 const SP500_SAMPLE = [
   'AAPL','MSFT','NVDA','GOOGL','AMZN','META','TSLA','BRK.B','AVGO','JPM',
   'LLY','V','UNH','XOM','MA','JNJ','PG','HD','MRK','ABBV',
@@ -984,28 +715,19 @@ async function startScan() {
   const btn = document.getElementById('scanBtn');
   btn.classList.add('scanning');
   btn.textContent = '⟳ SCANNING...';
-
   switchTab('discovery');
   document.getElementById('stockList').innerHTML = `
     <div class="loading-state">
       <div class="spinner"></div>
       <div class="loading-text">SCANNING MARKETS...</div>
     </div>`;
-
   try {
-    // Step 1: Get market movers from Finnhub
     const finnhubHot = await scanFinnhub();
-
-    // Step 2: Get Reddit trending
     const redditHot = await scanReddit();
-
-    // Step 3: Cross reference
     const results = crossReference(finnhubHot, redditHot);
-
     discoveryResults = results;
     updateCounts();
     renderDiscovery();
-
   } catch(e) {
     console.error('Scan error:', e);
     document.getElementById('stockList').innerHTML = `
@@ -1015,151 +737,96 @@ async function startScan() {
         <div class="empty-desc">Check your connection and try again.</div>
       </div>`;
   }
-
   btn.classList.remove('scanning');
   btn.textContent = '🔥 SCAN';
 }
 
 async function scanFinnhub() {
   const hot = new Map();
-
-  // Fetch quotes for sample universe in batches
   const batch = SP500_SAMPLE.slice(0, 40);
-  const quotes = await Promise.allSettled(
-    batch.map(async sym => {
-      const q = await fetchQuote(sym);
-      return { sym, q };
-    })
-  );
-
+  const quotes = await Promise.allSettled(batch.map(async sym => {
+    const q = await fetchQuote(sym);
+    return { sym, q };
+  }));
   quotes.forEach(r => {
     if(r.status === 'fulfilled' && r.value.q && r.value.q.c > 0) {
       const { sym, q } = r.value;
       const absChange = Math.abs(q.dp || 0);
-      if(absChange > 2) { // Only stocks moving more than 2%
-        hot.set(sym, {
-          ticker: sym,
-          price: q.c,
-          change: q.dp,
-          reason: `${q.dp > 0 ? '+' : ''}${q.dp.toFixed(2)}% today`,
-          source: 'finnhub',
-          score: absChange
-        });
+      if(absChange > 2) {
+        hot.set(sym, { ticker: sym, price: q.c, change: q.dp, reason: `${q.dp > 0 ? '+' : ''}${q.dp.toFixed(2)}% today`, source: 'finnhub', score: absChange });
       }
     }
   });
-
   return hot;
 }
 
 async function scanReddit() {
   const hot = new Map();
-
   try {
-    // Fetch trending from r/wallstreetbets and r/stocks
     const [wsb, stocks, investing, biotech] = await Promise.allSettled([
       fetch('/finnhub?type=reddit-wsb').then(r=>r.json()),
       fetch('/finnhub?type=reddit-stocks').then(r=>r.json()),
       fetch('/finnhub?type=reddit-investing').then(r=>r.json()),
       fetch('/finnhub?type=reddit-biotech').then(r=>r.json())
     ]);
-
     const posts = [];
     if(wsb.status === 'fulfilled') posts.push(...(wsb.value?.data?.children||[]));
     if(stocks.status === 'fulfilled') posts.push(...(stocks.value?.data?.children||[]));
     if(investing.status === 'fulfilled') posts.push(...(investing.value?.data?.children||[]));
     if(biotech.status === 'fulfilled') posts.push(...(biotech.value?.data?.children||[]));
-
-    // Extract tickers from post titles
     const dollarRegex = /\$([A-Z]{1,5})\b/g;
     const plainRegex = /\b(INTC|AAPL|MSFT|NVDA|TSLA|META|AMZN|GOOGL|AMD|PLTR|MRNA|GME|AMC|SPY|QQQ|COIN|HOOD|SOFI|RIVN|NIO|ARM|SMCI|TXN|CRM|ADBE|ORCL|JPM|BAC|GS|MS|TMO|ENPH|FSLR|UBER|SHOP|PYPL|AFRM|NFLX|DIS|SNAP|RBLX|SPOT|LLY|PFE|ABBV|REGN|VRTX|CRSP|BEAM|RXRX)\b/g;
     const mentions = new Map();
-
     posts.forEach(post => {
       const title = post?.data?.title || '';
       const text = post?.data?.selftext || '';
       const content = title + ' ' + text;
       let match;
       while((match = dollarRegex.exec(content)) !== null) {
-       const ticker = match[1];
-       mentions.set(ticker, (mentions.get(ticker) || 0) + 2);
-}
+        const ticker = match[1];
+        mentions.set(ticker, (mentions.get(ticker) || 0) + 2);
+      }
       while((match = plainRegex.exec(content)) !== null) {
-      const ticker = match[1];
-      mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
-}
-    });
-
-    // Only keep tickers mentioned 2+ times
-    mentions.forEach((count, ticker) => {
-      if(count >= 2) {
-        hot.set(ticker, {
-          ticker,
-          price: 0,
-          change: 0,
-          reason: `Mentioned ${count}x on Reddit`,
-          source: 'reddit',
-          score: count,
-          mentions: count
-        });
+        const ticker = match[1];
+        mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
       }
     });
-
-  } catch(e) {
-    console.log('Reddit scan failed:', e);
-  }
-
+    mentions.forEach((count, ticker) => {
+      if(count >= 2) {
+        hot.set(ticker, { ticker, price: 0, change: 0, reason: `Mentioned ${count}x on Reddit`, source: 'reddit', score: count, mentions: count });
+      }
+    });
+  } catch(e) { console.log('Reddit scan failed:', e); }
   return hot;
 }
 
 function crossReference(finnhubHot, redditHot) {
   const results = [];
   const seen = new Set();
-
-  // Stocks in BOTH — highest confidence
   finnhubHot.forEach((data, ticker) => {
     if(redditHot.has(ticker)) {
       const reddit = redditHot.get(ticker);
-      results.push({
-        ...data,
-        source: 'both',
-        reason: `${data.reason} · Reddit ${reddit.mentions}x`,
-        confidence: 'both'
-      });
+      results.push({ ...data, source: 'both', reason: `${data.reason} · Reddit ${reddit.mentions}x`, confidence: 'both' });
       seen.add(ticker);
     }
   });
-
-  // Finnhub only
   finnhubHot.forEach((data, ticker) => {
-    if(!seen.has(ticker)) {
-      results.push({ ...data, confidence: 'finnhub' });
-      seen.add(ticker);
-    }
+    if(!seen.has(ticker)) { results.push({ ...data, confidence: 'finnhub' }); seen.add(ticker); }
   });
-
-  // Reddit only — fetch prices
   redditHot.forEach((data, ticker) => {
-    if(!seen.has(ticker) && SP500_SAMPLE.includes(ticker)) {
-      results.push({ ...data, confidence: 'reddit' });
-      seen.add(ticker);
-    }
+    if(!seen.has(ticker) && SP500_SAMPLE.includes(ticker)) { results.push({ ...data, confidence: 'reddit' }); seen.add(ticker); }
   });
-
-  // Sort: both first, then by score
   results.sort((a,b) => {
     if(a.confidence === 'both' && b.confidence !== 'both') return -1;
     if(b.confidence === 'both' && a.confidence !== 'both') return 1;
     return b.score - a.score;
   });
-
   return results.slice(0, 20);
 }
 
 // ── RENDER DISCOVERY ───────────────────────────────────────────────────────────
 function renderDiscovery() {
   const el = document.getElementById('stockList');
-
   if(discoveryResults.length === 0) {
     el.innerHTML = `
       <div class="empty-state">
@@ -1169,7 +836,6 @@ function renderDiscovery() {
       </div>`;
     return;
   }
-
   const summary = `
     <div class="scan-summary">
       <div class="scan-dot"></div>
@@ -1180,19 +846,15 @@ function renderDiscovery() {
         <div class="legend-item"><div class="legend-dot" style="background:#ff6b35"></div>Reddit</div>
       </div>
     </div>`;
-
   const cards = discoveryResults.map((s, i) => {
     const up = s.change >= 0;
-    const badgeClass = `badge-${s.confidence}`;
     const badgeText = s.confidence === 'both' ? '🔥 HOT' : s.confidence === 'finnhub' ? 'FINNHUB' : 'REDDIT';
-    const heatClass = `card-heat ${s.confidence}`;
-
     return `<div class="stock-card" id="card-${s.ticker}" onclick="selectStock('${s.ticker}','${s.confidence}')" style="animation-delay:${i*0.04}s">
-      <div class="${heatClass}"></div>
+      <div class="card-heat ${s.confidence}"></div>
       <div class="card-main">
         <div class="card-top">
           <div class="card-ticker">${s.ticker}</div>
-          <div class="card-badge ${badgeClass}">${badgeText}</div>
+          <div class="card-badge badge-${s.confidence}">${badgeText}</div>
         </div>
         <div class="card-name" id="name-${s.ticker}">Loading...</div>
         <div class="card-reason">${s.reason}</div>
@@ -1203,18 +865,12 @@ function renderDiscovery() {
       </div>
     </div>`;
   }).join('');
-
   el.innerHTML = summary + cards;
-
-  // Load company names in background
   discoveryResults.forEach(s => loadCompanyName(s.ticker));
-
-  // Fetch prices for Reddit-only stocks
   discoveryResults.filter(s => s.confidence === 'reddit' && s.price === 0).forEach(async s => {
     const q = await fetchQuote(s.ticker);
     if(q && q.c > 0) {
-      s.price = q.c;
-      s.change = q.dp;
+      s.price = q.c; s.change = q.dp;
       const card = document.getElementById('card-' + s.ticker);
       if(card) {
         const right = card.querySelector('.card-right');
@@ -1229,34 +885,23 @@ function renderDiscovery() {
 async function loadCompanyName(ticker) {
   const el = document.getElementById('name-' + ticker);
   if(!el) return;
-
-  // Check if we already know the name
   const known = [...myStocks, ...watchlist].find(s => s.ticker === ticker);
   if(known) { el.textContent = known.name; return; }
-
   try {
     const res = await fetch(`/finnhub?type=profile&symbol=${ticker}`);
     const data = await res.json();
     if(data.name && el) el.textContent = data.name;
     else if(el) el.textContent = ticker;
-  } catch {
-    if(el) el.textContent = ticker;
-  }
+  } catch { if(el) el.textContent = ticker; }
 }
 
 // ── SELECT STOCK ───────────────────────────────────────────────────────────────
 async function selectStock(ticker, source) {
   selectedTicker = ticker;
-
-  // Highlight card
   document.querySelectorAll('.stock-card').forEach(c => c.classList.remove('selected'));
   const card = document.getElementById('card-' + ticker);
   if(card) card.classList.add('selected');
-
-  // Open detail panel
   openDetail();
-
-  // Show loading
   const panel = document.getElementById('detailPanel');
   panel.innerHTML = `
     <div class="drag-handle"></div>
@@ -1265,28 +910,15 @@ async function selectStock(ticker, source) {
       <div class="spinner"></div>
       <div class="loading-text">LOADING ${ticker}...</div>
     </div>`;
-
-  // Fetch all data in parallel
   const [quote, profile, earnings, analyst, news] = await Promise.all([
-    fetchQuote(ticker),
-    fetchProfile(ticker),
-    fetchEarnings(ticker),
-    fetchAnalyst(ticker),
-    fetchNews(ticker)
+    fetchQuote(ticker), fetchProfile(ticker), fetchEarnings(ticker), fetchAnalyst(ticker), fetchNews(ticker)
   ]);
-
   if(selectedTicker !== ticker) return;
-
-  // Calculate scores
   const scores = calcScore(quote, earnings, analyst, news);
   const up = (quote?.dp || 0) >= 0;
   const price = quote?.c || 0;
   const change = quote?.dp || 0;
-
-  // Score color
   const scoreColor = scores.total >= 60 ? 'var(--up)' : scores.total >= 40 ? 'var(--warn)' : 'var(--down)';
-
-  // Score rows
   const scoreRows = [
     { label:'Catalyst', pts:scores.catalyst, max:30, color:'var(--warn)', detail: earnings ? `${earnings.days}d to earnings` : 'No upcoming' },
     { label:'Analyst', pts:scores.analyst, max:20, color:'var(--accent)', detail: analyst ? `${analyst.bullishPct}% bullish — ${analyst.total} analysts` : 'No data' },
@@ -1294,16 +926,11 @@ async function selectStock(ticker, source) {
     { label:'Volatility', pts:scores.volatility, max:15, color:'#4da6ff', detail: `${Math.abs(change).toFixed(2)}% move today` },
     { label:'Social', pts:0, max:15, color:'#f472b6', detail: '⏳ Reddit coming soon' },
   ];
-
-  // Check if owned
   const owned = myStocks.find(s => s.ticker === ticker);
   const inWatchlist = watchlist.find(s => s.ticker === ticker);
-
   panel.innerHTML = `
     <div class="drag-handle"></div>
     <div class="detail-close" onclick="closeDetail()">✕</div>
-
-    <!-- Header -->
     <div class="detail-header">
       <div class="detail-top">
         <div class="detail-left">
@@ -1328,24 +955,20 @@ async function selectStock(ticker, source) {
         ${quote?.l ? `<span class="meta-pill">L: $${quote.l.toFixed(2)}</span>` : ''}
       </div>
     </div>
-
-    <!-- Action buttons -->
     <div style="display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border)">
-      ${!owned ? `<button onclick="addToMyStocks('${ticker}','${profile?.name||ticker}',${price})" 
+      ${!owned ? `<button onclick="addToMyStocks('${ticker}','${(profile?.name||ticker).replace(/'/g,"\\'")}',${price})"
         style="flex:1;padding:8px;background:rgba(0,255,208,0.08);border:1px solid rgba(0,255,208,0.2);border-radius:8px;color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">
         + Add to My Stocks
       </button>` : `<div style="flex:1;padding:8px;background:rgba(0,255,208,0.04);border:1px solid rgba(0,255,208,0.1);border-radius:8px;color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:center">
         💼 In My Stocks
       </div>`}
-      ${!inWatchlist ? `<button onclick="addToWatchlist('${ticker}','${profile?.name||ticker}',${price})"
+      ${!inWatchlist ? `<button onclick="addToWatchlist('${ticker}','${(profile?.name||ticker).replace(/'/g,"\\'")}',${price})"
         style="flex:1;padding:8px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.2);border-radius:8px;color:var(--warn);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">
         + Watchlist
       </button>` : `<div style="flex:1;padding:8px;background:rgba(255,184,0,0.04);border:1px solid rgba(255,184,0,0.1);border-radius:8px;color:var(--warn);font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:center">
         👁 Watching
       </div>`}
     </div>
-
-    <!-- AI Advice -->
     <div class="ai-advice-box">
       <div class="ai-advice-header">
         <span class="ai-label">🤖 AI Advice</span>
@@ -1354,8 +977,6 @@ async function selectStock(ticker, source) {
         ⚡ GET AI ADVICE — TAP TO ANALYSE
       </button>
     </div>
-
-    <!-- Score -->
     <div class="score-section">
       <div class="section-label">
         Opportunity Score
@@ -1371,8 +992,6 @@ async function selectStock(ticker, source) {
         <div class="score-pts" style="color:${r.color}">${r.pts}/${r.max}</div>
       </div>`).join('')}
     </div>
-
-    <!-- Catalyst -->
     ${earnings ? `
     <div class="catalyst-section">
       <div class="section-label" style="margin-bottom:8px">Next Earnings <span style="color:var(--accent);font-size:9px">● REAL</span></div>
@@ -1384,8 +1003,6 @@ async function selectStock(ticker, source) {
         </div>
       </div>
     </div>` : ''}
-
-    <!-- News -->
     <div class="news-section">
       <div class="section-label" style="margin-bottom:8px">Latest News <span style="color:var(--accent);font-size:9px">● LIVE</span></div>
       ${news.length > 0 ? news.map(n => `
@@ -1402,11 +1019,7 @@ async function selectStock(ticker, source) {
 // ── AI ADVICE ──────────────────────────────────────────────────────────────────
 async function getAIAdvice(ticker, price, change, score, earningsDays, bullishPct) {
   const btn = document.querySelector('.ai-get-btn');
-  if(btn) {
-    btn.textContent = '⟳ Analysing...';
-    btn.disabled = true;
-  }
-
+  if(btn) { btn.textContent = '⟳ Analysing...'; btn.disabled = true; }
   try {
     const prompt = `You are a stock market analyst. Analyse this stock and give brief advice.
 
@@ -1428,17 +1041,12 @@ Give a 2-3 sentence analysis in plain English that a beginner investor can under
         messages: [{ role: 'user', content: prompt }]
       })
     });
-
     const data = await response.json();
     const text = data.content?.[0]?.text || '';
-
-    // Extract verdict
     const verdictMatch = text.match(/VERDICT:\s*(BUY|MONITOR|AVOID|SELL)/i);
     const verdict = verdictMatch ? verdictMatch[1].toUpperCase() : 'MONITOR';
     const analysis = text.replace(/VERDICT:.*$/i, '').trim();
-
     const verdictClass = verdict === 'BUY' ? 'verdict-buy' : verdict === 'MONITOR' ? 'verdict-monitor' : verdict === 'SELL' ? 'verdict-sell' : 'verdict-avoid';
-
     const box = document.querySelector('.ai-advice-box');
     if(box) {
       box.innerHTML = `
@@ -1448,13 +1056,9 @@ Give a 2-3 sentence analysis in plain English that a beginner investor can under
         </div>
         <div class="ai-text">${analysis}</div>`;
     }
-
   } catch(e) {
     const btn = document.querySelector('.ai-get-btn');
-    if(btn) {
-      btn.textContent = '⚡ GET AI ADVICE — TAP TO ANALYSE';
-      btn.disabled = false;
-    }
+    if(btn) { btn.textContent = '⚡ GET AI ADVICE — TAP TO ANALYSE'; btn.disabled = false; }
     console.error('AI advice error:', e);
   }
 }
@@ -1465,14 +1069,11 @@ function addToMyStocks(ticker, name, price) {
     alert(`${ticker} is already in My Stocks`);
     return;
   }
-
-  // Show input form in detail panel
   const formHtml = `
     <div style="padding:16px 20px;background:rgba(0,255,208,0.04);border:1px solid rgba(0,255,208,0.15);border-radius:12px;margin:16px 20px">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:14px">
         ADD ${ticker} TO MY STOCKS
       </div>
-      
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div>
           <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">BUY PRICE ($)</div>
@@ -1485,7 +1086,6 @@ function addToMyStocks(ticker, name, price) {
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
         </div>
       </div>
-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <div>
           <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TAKE PROFIT (%)</div>
@@ -1498,7 +1098,6 @@ function addToMyStocks(ticker, name, price) {
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
         </div>
       </div>
-
       <div style="display:flex;gap:8px">
         <button onclick="confirmAddToMyStocks('${ticker}','${name}',${price})"
           style="flex:1;padding:10px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">
@@ -1510,20 +1109,14 @@ function addToMyStocks(ticker, name, price) {
         </button>
       </div>
     </div>`;
-
-  // Insert form after action buttons in detail panel
   const actionDiv = document.querySelector('.detail-panel [style*="display:flex;gap:8px;padding:12px"]');
   if(actionDiv) {
-    // Remove existing form if any
     const existing = document.getElementById('addStockForm');
     if(existing) existing.remove();
-    
     const formEl = document.createElement('div');
     formEl.id = 'addStockForm';
     formEl.innerHTML = formHtml;
     actionDiv.after(formEl);
-    
-    // Scroll to form
     formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
@@ -1531,21 +1124,15 @@ function addToMyStocks(ticker, name, price) {
 function editMyStock(ticker) {
   const stock = myStocks.find(s => s.ticker === ticker);
   if(!stock) return;
-
   const formHtml = `
     <div style="padding:16px;background:rgba(0,255,208,0.04);border:1px solid rgba(0,255,208,0.15);border-radius:12px;margin:12px 16px">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:14px">
         EDIT ${ticker} POSITION
       </div>
-
       <div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:'IBM Plex Mono',monospace">
         Current: ${stock.shares} shares @ $${stock.buyPrice.toFixed(2)} avg
       </div>
-
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">
-        ADD MORE SHARES
-      </div>
-
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">ADD MORE SHARES</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <div>
           <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">NEW SHARES BOUGHT</div>
@@ -1558,11 +1145,7 @@ function editMyStock(ticker) {
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
         </div>
       </div>
-
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">
-        ADJUST SETTINGS
-      </div>
-
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">ADJUST SETTINGS</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <div>
           <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TAKE PROFIT (%)</div>
@@ -1575,7 +1158,6 @@ function editMyStock(ticker) {
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
         </div>
       </div>
-
       <div style="display:flex;gap:8px">
         <button onclick="confirmEditMyStock('${ticker}')"
           style="flex:1;padding:10px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">
@@ -1587,13 +1169,10 @@ function editMyStock(ticker) {
         </button>
       </div>
     </div>`;
-
-  // Insert form into stock list below the card
   const card = document.getElementById('card-' + ticker);
   if(card) {
     const existing = document.getElementById('editForm-' + ticker);
     if(existing) { existing.remove(); return; }
-
     const formEl = document.createElement('div');
     formEl.id = 'editForm-' + ticker;
     formEl.innerHTML = formHtml;
@@ -1605,28 +1184,19 @@ function editMyStock(ticker) {
 function confirmEditMyStock(ticker) {
   const stock = myStocks.find(s => s.ticker === ticker);
   if(!stock) return;
-
-  // Get new shares and price
   const newShares = parseFloat(document.getElementById('edit-newshares')?.value) || 0;
   const newPrice = parseFloat(document.getElementById('edit-newprice')?.value) || stock.currentPrice;
-
-  // Calculate weighted average if adding more shares
   if(newShares > 0) {
     const totalCost = (stock.buyPrice * stock.shares) + (newPrice * newShares);
     const totalShares = stock.shares + newShares;
-    stock.buyPrice = totalCost / totalShares; // new average price
+    stock.buyPrice = totalCost / totalShares;
     stock.shares = totalShares;
   }
-
-  // Update thresholds
   stock.takeProfit = parseFloat(document.getElementById('edit-takeprofit')?.value) || stock.takeProfit;
   stock.stopLoss = parseFloat(document.getElementById('edit-stoploss')?.value) || stock.stopLoss;
-
   localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
-
   const form = document.getElementById('editForm-' + ticker);
   if(form) form.remove();
-
   renderMyStocks();
 }
 
@@ -1634,10 +1204,8 @@ function removeMyStock(ticker) {
   myStocks = myStocks.filter(s => s.ticker !== ticker);
   localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
   updateCounts();
-
   const form = document.getElementById('editForm-' + ticker);
   if(form) form.remove();
-
   renderMyStocks();
 }
 
@@ -1646,26 +1214,11 @@ function confirmAddToMyStocks(ticker, name, currentPrice) {
   const shares = parseFloat(document.getElementById('form-shares')?.value) || 1;
   const takeProfit = parseFloat(document.getElementById('form-takeprofit')?.value) || 20;
   const stopLoss = parseFloat(document.getElementById('form-stoploss')?.value) || 10;
-
-  myStocks.push({
-    ticker,
-    name,
-    buyPrice,
-    currentPrice,
-    shares,
-    takeProfit,
-    stopLoss,
-    addedAt: new Date().toISOString()
-  });
-
+  myStocks.push({ ticker, name, buyPrice, currentPrice, shares, takeProfit, stopLoss, addedAt: new Date().toISOString() });
   localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
   updateCounts();
-
-  // Remove form and refresh detail
   const form = document.getElementById('addStockForm');
   if(form) form.remove();
-
-  // Update button
   const btn = document.querySelector(`button[onclick*="addToMyStocks"]`);
   if(btn) {
     btn.textContent = '✅ In My Stocks';
@@ -1674,25 +1227,20 @@ function confirmAddToMyStocks(ticker, name, currentPrice) {
     btn.style.color = 'var(--accent)';
     btn.onclick = null;
   }
-
-  // Switch to My Stocks tab to show it
   switchTab('mystocks');
 }
 
 function addToWatchlist(ticker, name, price) {
   if(watchlist.find(s => s.ticker === ticker)) return;
-
   watchlist.push({ ticker, name, price, addedAt: new Date().toISOString() });
   localStorage.setItem('apexWatchlist', JSON.stringify(watchlist));
   updateCounts();
-
   const btn = document.querySelector(`button[onclick*="addToWatchlist"]`);
   if(btn) btn.textContent = '✅ Added to Watchlist';
 }
 
 async function renderMyStocks() {
   const el = document.getElementById('stockList');
-
   if(myStocks.length === 0) {
     el.innerHTML = `
       <div class="empty-state">
@@ -1703,7 +1251,6 @@ async function renderMyStocks() {
     return;
   }
 
-  // Show loading then fetch real prices
   el.innerHTML = `<div class="loading-state"><div class="spinner"></div><div class="loading-text">UPDATING PRICES...</div></div>`;
 
   // Fetch current prices
@@ -1711,15 +1258,15 @@ async function renderMyStocks() {
     const q = await fetchQuote(s.ticker);
     if(q && q.c > 0) s.currentPrice = q.c;
   }));
-
   localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
 
-  // Calculate portfolio totals
+  // Check alerts (earnings fetched inside checkAlerts)
+  const alerts = await checkAlerts();
+  showAlertDotIfNeeded(alerts);
+
+  // Portfolio totals
   let totalValue = 0, totalCost = 0;
-  myStocks.forEach(s => {
-    totalValue += s.currentPrice * s.shares;
-    totalCost += s.buyPrice * s.shares;
-  });
+  myStocks.forEach(s => { totalValue += s.currentPrice * s.shares; totalCost += s.buyPrice * s.shares; });
   const totalPnl = totalValue - totalCost;
   const totalPnlPct = totalCost > 0 ? (totalPnl/totalCost)*100 : 0;
 
@@ -1747,19 +1294,12 @@ async function renderMyStocks() {
     const pnl = (s.currentPrice - s.buyPrice) * s.shares;
     const pnlPct = ((s.currentPrice - s.buyPrice) / s.buyPrice) * 100;
     const up = pnl >= 0;
-
-    // Check alerts
-    let alertMsg = '';
-    if(pnlPct >= s.takeProfit) alertMsg = `🎯 Take profit target hit (+${s.takeProfit}%)`;
-    else if(pnlPct <= -s.stopLoss) alertMsg = `⚠️ Stop loss level reached (-${s.stopLoss}%)`;
-
     return `<div class="stock-card" id="card-${s.ticker}" onclick="selectStock('${s.ticker}','owned')" style="animation-delay:${i*0.04}s">
       <div class="card-heat owned"></div>
       <div class="card-main">
         <div class="card-top">
           <div class="card-ticker">${s.ticker}</div>
           <div class="card-badge badge-owned">OWNED</div>
-          ${alertMsg ? `<div style="font-size:10px;color:var(--warn)">${alertMsg}</div>` : ''}
         </div>
         <div class="card-name">${s.name}</div>
         <div class="card-reason" onclick="editMyStock('${s.ticker}')" style="cursor:pointer;color:var(--accent)">
@@ -1773,13 +1313,13 @@ async function renderMyStocks() {
     </div>`;
   }).join('');
 
-  el.innerHTML = pnlBar + cards;
+  // Alerts at the top, then portfolio bar, then cards
+  el.innerHTML = renderAlerts(alerts) + pnlBar + cards;
 }
 
 // ── WATCHLIST ──────────────────────────────────────────────────────────────────
 async function renderWatchlist() {
   const el = document.getElementById('stockList');
-
   if(watchlist.length === 0) {
     el.innerHTML = `
       <div class="empty-state">
@@ -1789,17 +1329,12 @@ async function renderWatchlist() {
       </div>`;
     return;
   }
-
   el.innerHTML = `<div class="loading-state"><div class="spinner"></div><div class="loading-text">UPDATING...</div></div>`;
-
-  // Fetch prices
   await Promise.all(watchlist.map(async s => {
     const q = await fetchQuote(s.ticker);
     if(q && q.c > 0) { s.price = q.c; s.change = q.dp; }
   }));
-
   localStorage.setItem('apexWatchlist', JSON.stringify(watchlist));
-
   const cards = watchlist.map((s, i) => {
     const up = (s.change || 0) >= 0;
     return `<div class="stock-card" id="card-${s.ticker}" onclick="selectStock('${s.ticker}','watch')" style="animation-delay:${i*0.04}s">
@@ -1819,7 +1354,6 @@ async function renderWatchlist() {
       </div>
     </div>`;
   }).join('');
-
   el.innerHTML = cards;
 }
 
@@ -1835,20 +1369,16 @@ function removeFromWatchlist(ticker, e) {
 async function loadStock(ticker, name) {
   document.getElementById('searchResults').classList.remove('open');
   document.getElementById('searchInput').value = '';
-
-  // Add to watchlist automatically
   if(!watchlist.find(s => s.ticker === ticker)) {
     watchlist.push({ ticker, name, price: 0, change: 0, addedAt: new Date().toISOString() });
     localStorage.setItem('apexWatchlist', JSON.stringify(watchlist));
     updateCounts();
   }
-
-  // Switch to watchlist tab and select
   switchTab('watchlist');
   await selectStock(ticker, 'watch');
 }
 
-// ── DETAIL PANEL OPEN/CLOSE ────────────────────────────────────────────────────
+// ── DETAIL PANEL ───────────────────────────────────────────────────────────────
 function openDetail() {
   document.getElementById('detailPanel').classList.add('open');
   document.getElementById('detailOverlay').classList.add('open');
@@ -1863,17 +1393,22 @@ function closeDetail() {
   document.querySelectorAll('.stock-card').forEach(c => c.classList.remove('selected'));
 }
 
-// On desktop, detail panel is always visible — no need to open/close
 function isDesktop() { return window.innerWidth >= 768; }
-
-// Override openDetail for desktop
 const _openDetail = openDetail;
-window.openDetail = function() {
-  if(!isDesktop()) _openDetail();
-};
+window.openDetail = function() { if(!isDesktop()) _openDetail(); };
 
 // ── INIT ───────────────────────────────────────────────────────────────────────
 updateCounts();
+
+// On load: silently fetch prices for owned stocks, check alerts, show dot if needed
+if(myStocks.length > 0) {
+  Promise.all(myStocks.map(async s => {
+    const q = await fetchQuote(s.ticker);
+    if(q && q.c > 0) s.currentPrice = q.c;
+  })).then(() => {
+    checkAlerts().then(alerts => showAlertDotIfNeeded(alerts));
+  });
+}
 </script>
 </body>
 </html>

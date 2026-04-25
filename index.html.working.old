@@ -19,7 +19,8 @@
   --danger:  #ff3355;
   --text:    #e2eaf5;
   --text2:   #6b7f99;
-  --text3:   #2e3f55;
+  /*--text3:   #2e3f55;*/
+  --text3:   #e2eaf5;
   --up:      #00ffd0;
   --down:    #ff3355;
   --card:    rgba(255,255,255,0.03);
@@ -1056,17 +1057,20 @@ async function scanReddit() {
 
   try {
     // Fetch trending from r/wallstreetbets and r/stocks
-    const [wsb, stocks] = await Promise.allSettled([
+    const [wsb, stocks, investing, biotech] = await Promise.allSettled([
       fetch('/finnhub?type=reddit-wsb').then(r=>r.json()),
-      fetch('/finnhub?type=reddit-stocks').then(r=>r.json())
+      fetch('/finnhub?type=reddit-stocks').then(r=>r.json()),
+      fetch('/finnhub?type=reddit-investing').then(r=>r.json()),
+      fetch('/finnhub?type=reddit-biotech').then(r=>r.json())
     ]);
 
     const posts = [];
     if(wsb.status === 'fulfilled') posts.push(...(wsb.value?.data?.children||[]));
     if(stocks.status === 'fulfilled') posts.push(...(stocks.value?.data?.children||[]));
+    if(investing.status === 'fulfilled') posts.push(...(investing.value?.data?.children||[]));
+    if(biotech.status === 'fulfilled') posts.push(...(biotech.value?.data?.children||[]));
 
     // Extract tickers from post titles
-    // Match both $TICKER and plain TICKER formats
     const dollarRegex = /\$([A-Z]{1,5})\b/g;
     const plainRegex = /\b(INTC|AAPL|MSFT|NVDA|TSLA|META|AMZN|GOOGL|AMD|PLTR|MRNA|GME|AMC|SPY|QQQ|COIN|HOOD|SOFI|RIVN|NIO|ARM|SMCI|TXN|CRM|ADBE|ORCL|JPM|BAC|GS|MS|TMO|ENPH|FSLR|UBER|SHOP|PYPL|AFRM|NFLX|DIS|SNAP|RBLX|SPOT|LLY|PFE|ABBV|REGN|VRTX|CRSP|BEAM|RXRX)\b/g;
     const mentions = new Map();
@@ -1076,16 +1080,15 @@ async function scanReddit() {
       const text = post?.data?.selftext || '';
       const content = title + ' ' + text;
       let match;
-  // Catch $TICKER format
-  while((match = dollarRegex.exec(content)) !== null) {
-   const ticker = match[1];
-   mentions.set(ticker, (mentions.get(ticker) || 0) + 2); // weight higher
+      while((match = dollarRegex.exec(content)) !== null) {
+       const ticker = match[1];
+       mentions.set(ticker, (mentions.get(ticker) || 0) + 2);
 }
-// Catch plain TICKER format
-while((match = plainRegex.exec(content)) !== null) {
-  const ticker = match[1];
-  mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
-}});
+      while((match = plainRegex.exec(content)) !== null) {
+      const ticker = match[1];
+      mentions.set(ticker, (mentions.get(ticker) || 0) + 1);
+}
+    });
 
     // Only keep tickers mentioned 2+ times
     mentions.forEach((count, ticker) => {
@@ -1458,26 +1461,222 @@ Give a 2-3 sentence analysis in plain English that a beginner investor can under
 
 // ── MY STOCKS ──────────────────────────────────────────────────────────────────
 function addToMyStocks(ticker, name, price) {
-  if(myStocks.find(s => s.ticker === ticker)) return;
+  if(myStocks.find(s => s.ticker === ticker)) {
+    alert(`${ticker} is already in My Stocks`);
+    return;
+  }
 
-  // Simple add with defaults — user can set thresholds later
+  // Show input form in detail panel
+  const formHtml = `
+    <div style="padding:16px 20px;background:rgba(0,255,208,0.04);border:1px solid rgba(0,255,208,0.15);border-radius:12px;margin:16px 20px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:14px">
+        ADD ${ticker} TO MY STOCKS
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">BUY PRICE ($)</div>
+          <input id="form-buyprice" type="number" step="0.01" value="${price.toFixed(2)}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SHARES</div>
+          <input id="form-shares" type="number" step="1" min="1" value="1"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TAKE PROFIT (%)</div>
+          <input id="form-takeprofit" type="number" step="1" value="20"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--up);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">STOP LOSS (%)</div>
+          <input id="form-stoploss" type="number" step="1" value="10"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button onclick="confirmAddToMyStocks('${ticker}','${name}',${price})"
+          style="flex:1;padding:10px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">
+          CONFIRM ADD
+        </button>
+        <button onclick="selectStock('${ticker}','watch')"
+          style="padding:10px 14px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">
+          CANCEL
+        </button>
+      </div>
+    </div>`;
+
+  // Insert form after action buttons in detail panel
+  const actionDiv = document.querySelector('.detail-panel [style*="display:flex;gap:8px;padding:12px"]');
+  if(actionDiv) {
+    // Remove existing form if any
+    const existing = document.getElementById('addStockForm');
+    if(existing) existing.remove();
+    
+    const formEl = document.createElement('div');
+    formEl.id = 'addStockForm';
+    formEl.innerHTML = formHtml;
+    actionDiv.after(formEl);
+    
+    // Scroll to form
+    formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function editMyStock(ticker) {
+  const stock = myStocks.find(s => s.ticker === ticker);
+  if(!stock) return;
+
+  const formHtml = `
+    <div style="padding:16px;background:rgba(0,255,208,0.04);border:1px solid rgba(0,255,208,0.15);border-radius:12px;margin:12px 16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:14px">
+        EDIT ${ticker} POSITION
+      </div>
+
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:'IBM Plex Mono',monospace">
+        Current: ${stock.shares} shares @ $${stock.buyPrice.toFixed(2)} avg
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">
+        ADD MORE SHARES
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">NEW SHARES BOUGHT</div>
+          <input id="edit-newshares" type="number" step="0.01" min="0" placeholder="0"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">PRICE PAID ($)</div>
+          <input id="edit-newprice" type="number" step="0.01" placeholder="${stock.currentPrice.toFixed(2)}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">
+        ADJUST SETTINGS
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">TAKE PROFIT (%)</div>
+          <input id="edit-takeprofit" type="number" step="1" value="${stock.takeProfit}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--up);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">STOP LOSS (%)</div>
+          <input id="edit-stoploss" type="number" step="1" value="${stock.stopLoss}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button onclick="confirmEditMyStock('${ticker}')"
+          style="flex:1;padding:10px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">
+          SAVE
+        </button>
+        <button onclick="removeMyStock('${ticker}')"
+          style="padding:10px 14px;background:rgba(255,51,85,0.1);border:1px solid rgba(255,51,85,0.2);border-radius:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">
+          REMOVE
+        </button>
+      </div>
+    </div>`;
+
+  // Insert form into stock list below the card
+  const card = document.getElementById('card-' + ticker);
+  if(card) {
+    const existing = document.getElementById('editForm-' + ticker);
+    if(existing) { existing.remove(); return; }
+
+    const formEl = document.createElement('div');
+    formEl.id = 'editForm-' + ticker;
+    formEl.innerHTML = formHtml;
+    card.after(formEl);
+    formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function confirmEditMyStock(ticker) {
+  const stock = myStocks.find(s => s.ticker === ticker);
+  if(!stock) return;
+
+  // Get new shares and price
+  const newShares = parseFloat(document.getElementById('edit-newshares')?.value) || 0;
+  const newPrice = parseFloat(document.getElementById('edit-newprice')?.value) || stock.currentPrice;
+
+  // Calculate weighted average if adding more shares
+  if(newShares > 0) {
+    const totalCost = (stock.buyPrice * stock.shares) + (newPrice * newShares);
+    const totalShares = stock.shares + newShares;
+    stock.buyPrice = totalCost / totalShares; // new average price
+    stock.shares = totalShares;
+  }
+
+  // Update thresholds
+  stock.takeProfit = parseFloat(document.getElementById('edit-takeprofit')?.value) || stock.takeProfit;
+  stock.stopLoss = parseFloat(document.getElementById('edit-stoploss')?.value) || stock.stopLoss;
+
+  localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
+
+  const form = document.getElementById('editForm-' + ticker);
+  if(form) form.remove();
+
+  renderMyStocks();
+}
+
+function removeMyStock(ticker) {
+  myStocks = myStocks.filter(s => s.ticker !== ticker);
+  localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
+  updateCounts();
+
+  const form = document.getElementById('editForm-' + ticker);
+  if(form) form.remove();
+
+  renderMyStocks();
+}
+
+function confirmAddToMyStocks(ticker, name, currentPrice) {
+  const buyPrice = parseFloat(document.getElementById('form-buyprice')?.value) || currentPrice;
+  const shares = parseFloat(document.getElementById('form-shares')?.value) || 1;
+  const takeProfit = parseFloat(document.getElementById('form-takeprofit')?.value) || 20;
+  const stopLoss = parseFloat(document.getElementById('form-stoploss')?.value) || 10;
+
   myStocks.push({
     ticker,
     name,
-    buyPrice: price,
-    currentPrice: price,
-    shares: 1,
-    takeProfit: 20,  // default 20%
-    stopLoss: 10,    // default 10%
+    buyPrice,
+    currentPrice,
+    shares,
+    takeProfit,
+    stopLoss,
     addedAt: new Date().toISOString()
   });
 
   localStorage.setItem('apexMyStocks', JSON.stringify(myStocks));
   updateCounts();
 
-  // Show confirmation
+  // Remove form and refresh detail
+  const form = document.getElementById('addStockForm');
+  if(form) form.remove();
+
+  // Update button
   const btn = document.querySelector(`button[onclick*="addToMyStocks"]`);
-  if(btn) btn.textContent = '✅ Added to My Stocks';
+  if(btn) {
+    btn.textContent = '✅ In My Stocks';
+    btn.style.background = 'rgba(0,255,208,0.04)';
+    btn.style.borderColor = 'rgba(0,255,208,0.1)';
+    btn.style.color = 'var(--accent)';
+    btn.onclick = null;
+  }
+
+  // Switch to My Stocks tab to show it
+  switchTab('mystocks');
 }
 
 function addToWatchlist(ticker, name, price) {
@@ -1563,7 +1762,9 @@ async function renderMyStocks() {
           ${alertMsg ? `<div style="font-size:10px;color:var(--warn)">${alertMsg}</div>` : ''}
         </div>
         <div class="card-name">${s.name}</div>
-        <div class="card-reason">Bought @ $${s.buyPrice.toFixed(2)} · ${s.shares} share${s.shares>1?'s':''}</div>
+        <div class="card-reason" onclick="editMyStock('${s.ticker}')" style="cursor:pointer;color:var(--accent)">
+         Bought @ $${s.buyPrice.toFixed(2)} · ${s.shares} share${s.shares>1?'s':''} · ✎ Edit
+        </div>
       </div>
       <div class="card-right">
         <div class="card-price">$${s.currentPrice.toFixed(2)}</div>
