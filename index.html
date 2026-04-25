@@ -1534,17 +1534,29 @@ function editMyStock(ticker) {
         EDIT ${ticker} POSITION
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:'IBM Plex Mono',monospace">
+        Current: ${stock.shares} shares @ $${stock.buyPrice.toFixed(2)} avg
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">
+        ADD MORE SHARES
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <div>
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">BUY PRICE ($)</div>
-          <input id="edit-buyprice" type="number" step="0.01" value="${stock.buyPrice.toFixed(2)}"
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">NEW SHARES BOUGHT</div>
+          <input id="edit-newshares" type="number" step="0.01" min="0" placeholder="0"
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
         </div>
         <div>
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">SHARES</div>
-          <input id="edit-shares" type="number" step="0.01" min="0.01" value="${stock.shares}"
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono',monospace">PRICE PAID ($)</div>
+          <input id="edit-newprice" type="number" step="0.01" placeholder="${stock.currentPrice.toFixed(2)}"
             style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none"/>
         </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--warn);margin-bottom:8px">
+        ADJUST SETTINGS
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
@@ -1563,7 +1575,7 @@ function editMyStock(ticker) {
       <div style="display:flex;gap:8px">
         <button onclick="confirmEditMyStock('${ticker}')"
           style="flex:1;padding:10px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">
-          SAVE CHANGES
+          SAVE
         </button>
         <button onclick="removeMyStock('${ticker}')"
           style="padding:10px 14px;background:rgba(255,51,85,0.1);border:1px solid rgba(255,51,85,0.2);border-radius:8px;color:var(--down);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">
@@ -1571,27 +1583,25 @@ function editMyStock(ticker) {
         </button>
       </div>
     </div>`;
-
-  // Insert form into stock list below the card
-  const card = document.getElementById('card-' + ticker);
-  if(card) {
-    const existing = document.getElementById('editForm-' + ticker);
-    if(existing) { existing.remove(); return; } // toggle
-
-    const formEl = document.createElement('div');
-    formEl.id = 'editForm-' + ticker;
-    formEl.innerHTML = formHtml;
-    card.after(formEl);
-    formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
 }
 
 function confirmEditMyStock(ticker) {
   const stock = myStocks.find(s => s.ticker === ticker);
   if(!stock) return;
 
-  stock.buyPrice = parseFloat(document.getElementById('edit-buyprice')?.value) || stock.buyPrice;
-  stock.shares = parseFloat(document.getElementById('edit-shares')?.value) || stock.shares;
+  // Get new shares and price
+  const newShares = parseFloat(document.getElementById('edit-newshares')?.value) || 0;
+  const newPrice = parseFloat(document.getElementById('edit-newprice')?.value) || stock.currentPrice;
+
+  // Calculate weighted average if adding more shares
+  if(newShares > 0) {
+    const totalCost = (stock.buyPrice * stock.shares) + (newPrice * newShares);
+    const totalShares = stock.shares + newShares;
+    stock.buyPrice = totalCost / totalShares; // new average price
+    stock.shares = totalShares;
+  }
+
+  // Update thresholds
   stock.takeProfit = parseFloat(document.getElementById('edit-takeprofit')?.value) || stock.takeProfit;
   stock.stopLoss = parseFloat(document.getElementById('edit-stoploss')?.value) || stock.stopLoss;
 
