@@ -833,7 +833,7 @@ async function scanFinnhub(redditHot) {
         const absChange = Math.abs(q.dp || 0);
         // 2% threshold for S&P 500 stocks
         // 1% threshold for Reddit-only tickers (lower bar since Reddit found them)
-        const threshold = SP500_FULL.includes(sym) ? 0.5 : 0.3;
+        const threshold = SP500_FULL.includes(sym) ? 2 : 1;
         if(absChange >= threshold) {
           hot.set(sym, {
             ticker: sym,
