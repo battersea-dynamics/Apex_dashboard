@@ -859,32 +859,29 @@ async function scanFinnhub(redditHot) {
 async function scanReddit() {
   const hot = new Map();
 
-  // ── 15 SUBREDDITS ──────────────────────────────────────────────────────────
-  // TODO: increase REDDIT_LIMIT to 100 when app becomes profitable
+  // 4 SUBREDDITS, fetched sequentially with delay to avoid rate limiting
+  // Fetching in parallel caused Reddit to rate-limit Cloudflare's IP
+  // TODO: expand to more subreddits once Reddit API registration approved
   const subreddits = [
-    'reddit-wsb',         // r/wallstreetbets — highest signal
-    'reddit-stocks',      // r/stocks
-    'reddit-investing',   // r/investing
-    'reddit-options',     // r/options — derivatives signal
-    'reddit-stockmarket', // r/StockMarket
-    'reddit-daytrading',  // r/Daytrading
-    'reddit-valueinvesting', // r/ValueInvesting
-    'reddit-pennystocks', // r/pennystocks — high volatility picks
-    'reddit-biotech',     // r/biotech
-    'reddit-pharma',      // pharma/drug approvals
-    'reddit-tech',        // r/technology — tech stock signals
-    'reddit-securityanalysis', // r/SecurityAnalysis — deeper analysis
-    'reddit-energy',      // r/energy — energy stocks
-    'reddit-dividends',   // r/dividends — income stocks
-    'reddit-etfs',        // r/ETFs — sector flows
+    'reddit-wsb',       // r/wallstreetbets
+    'reddit-stocks',    // r/stocks
+    'reddit-investing', // r/investing
+    'reddit-biotech',   // r/biotech
   ];
 
-  // Fetch all subreddits in parallel
-  const results = await Promise.allSettled(
-    subreddits.map(sub => fetch(`/finnhub?type=${sub}`).then(r => r.json()))
-  );
+  // Fetch one at a time with 1s gap to stay under Reddit's rate limit
+  const results = [];
+  for(const sub of subreddits) {
+    try {
+      const data = await fetch(`/finnhub?type=${sub}`).then(r => r.json());
+      results.push({ status: 'fulfilled', value: data });
+    } catch(e) {
+      results.push({ status: 'rejected' });
+    }
+    await sleep(1000);
+  }
 
-  // Collect all posts
+    // Collect all posts
   const posts = [];
   results.forEach(r => {
     if(r.status === 'fulfilled') {
