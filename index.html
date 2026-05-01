@@ -862,18 +862,22 @@ async function scanReddit() {
   // 4 SUBREDDITS, fetched sequentially with delay to avoid rate limiting
   // Fetching in parallel caused Reddit to rate-limit Cloudflare's IP
   // TODO: expand to more subreddits once Reddit API registration approved
-  const subreddits = [
-    'reddit-wsb',       // r/wallstreetbets
-    'reddit-stocks',    // r/stocks
-    'reddit-investing', // r/investing
-    'reddit-biotech',   // r/biotech
+  // Fetch directly from browser (not via Cloudflare) — Reddit blocks datacenter IPs
+  // Browser requests use your home/phone IP which Reddit allows
+  const REDDIT_URLS = [
+    'https://www.reddit.com/r/wallstreetbets/hot.json?limit=50',
+    'https://www.reddit.com/r/stocks/hot.json?limit=50',
+    'https://www.reddit.com/r/investing/hot.json?limit=50',
+    'https://www.reddit.com/r/biotech/hot.json?limit=50',
   ];
 
-  // Fetch one at a time with 1s gap to stay under Reddit's rate limit
+  // Fetch one at a time with 1s gap to be polite to Reddit
   const results = [];
-  for(const sub of subreddits) {
+  for(const url of REDDIT_URLS) {
     try {
-      const data = await fetch(`/finnhub?type=${sub}`).then(r => r.json());
+      const data = await fetch(url, {
+        headers: { 'Accept': 'application/json' }
+      }).then(r => r.json());
       results.push({ status: 'fulfilled', value: data });
     } catch(e) {
       results.push({ status: 'rejected' });
