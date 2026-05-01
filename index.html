@@ -1198,12 +1198,11 @@ Analyst consensus: ${bullishPct}% bullish
 
 Give a 2-3 sentence analysis in plain English that a beginner investor can understand. End with ONE word verdict: BUY, MONITOR, AVOID, or SELL. Format: [your analysis] VERDICT: [word]`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Route through Cloudflare to avoid CORS — API key stays secure on server
+    const response = await fetch('/finnhub?type=ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
     });

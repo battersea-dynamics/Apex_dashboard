@@ -5,6 +5,50 @@ export async function onRequest(context) {
   const query = url.searchParams.get('query');
   const finnhubKey = context.env.FINNHUB_API_KEY;
   const alphaKey = context.env.ALPHA_VANTAGE_KEY;
+  const anthropicKey = context.env.ANTHROPIC_API_KEY;
+
+  // Handle CORS preflight
+  if(context.request.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      }
+    });
+  }
+
+  // AI Advice — POST to Anthropic via Cloudflare (avoids CORS)
+  if(type === 'ai') {
+    try {
+      const body = await context.request.json();
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: body.messages
+        })
+      });
+      const data = await response.text();
+      return new Response(data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        }
+      });
+    } catch(err) {
+      return new Response(JSON.stringify({ error: err.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+  }
 
   const today = new Date();
   const pad = n => String(n).padStart(2,'0');
